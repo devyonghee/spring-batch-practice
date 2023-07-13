@@ -1,6 +1,8 @@
-package me.devyonghee.batchhelloworold
+package me.devyonghee.helloworld
 
+import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
@@ -10,6 +12,7 @@ import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.transaction.PlatformTransactionManager
 
+@EnableBatchProcessing
 @SpringBootApplication
 class HelloWorldApplication(
     private val jobRepository: JobRepository,
@@ -17,7 +20,10 @@ class HelloWorldApplication(
 ) {
 
     @Bean
-    fun job() {
+    fun job(): Job {
+        return JobBuilder("job", jobRepository)
+            .start(step())
+            .build()
     }
 
     @Bean

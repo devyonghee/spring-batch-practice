@@ -22,13 +22,13 @@
 
 ### JobInstance
 
-- 스프링 배치 잡의 논리적인 실행, 잡의 이름과 잡의 논리적인 실행을 위해 제공되는 고유한 식별 파라미터 모음  
-- 잡이 실행될 때마다 새로운 JobInstance 생성  
+- 스프링 배치 잡의 논리적인 실행, 잡의 이름과 잡의 논리적인 실행을 위해 제공되는 고유한 식별 파라미터 모음
+- 잡이 실행될 때마다 새로운 JobInstance 생성
 - 실패한 잡을 재식작하면 JobInstance 은 생성되지 않음
 
 ### JobExecution
 
-- 스프링 배치 잡의 실제 실행  
+- 스프링 배치 잡의 실제 실행
 - 잡을 구동할 때마다 새로운 JobExecution 생성
 - 잡이 실패한 이후 다시 실행해도 새로운 JobExecution 생성
 
@@ -52,3 +52,11 @@
         - `ItemProcessor` : 데이터를 가공(선택)
         - `ItemWriter` : 데이터를 저장
 
+
+- JobRepository: 실행 중인 잡의 상태를 기록하는 데 사용
+- JobLauncher: 잡을 구동하는 데 사용
+- JobExplorer: JobRepository 을 사용해 읽기 전용 작업을 수행하는데 사용
+- JobRegistry: 특정 런처 구현체를 사용할 때 잡을 찾는 용도
+- PlatformTransactionManager: 잡 진행 과정에서 트랜잭션을 다루는데 사용
+- JobBuilderFactory: 잡을 생성하는 빌더 (`JobBuilder` 로 대체)
+- StepBuilderFactory: 스텝을 생성하는 빌더 (`StepBuilder` 로 대체)
