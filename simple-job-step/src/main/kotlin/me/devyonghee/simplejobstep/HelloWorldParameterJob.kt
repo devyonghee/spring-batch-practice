@@ -1,21 +1,22 @@
-package me.devyonghee.helloworld
+package me.devyonghee.simplejobstep
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
+import org.springframework.batch.core.StepContribution
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
+import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.core.step.builder.StepBuilder
+import org.springframework.batch.core.step.tasklet.Tasklet
 import org.springframework.batch.repeat.RepeatStatus
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.transaction.PlatformTransactionManager
 
-//@EnableBatchProcessing // 스프링 부트 3 이상부터는 필요하지 않음
-@SpringBootApplication
-class HelloWorldApplication(
+@Configuration
+class HelloWorldParameterJob(
     private val jobRepository: JobRepository,
     private val transactionManager: PlatformTransactionManager,
 ) {
@@ -23,21 +24,24 @@ class HelloWorldApplication(
 
     @Bean
     fun job(): Job {
-        return JobBuilder("job", jobRepository)
-            .start(step())
+        return JobBuilder("basicJob", jobRepository)
+            .start(step1())
             .build()
     }
 
     @Bean
-    fun step(): Step {
+    fun step1(): Step {
         return StepBuilder("step1", jobRepository)
-            .tasklet({ _, _ ->
-                log.info("Hello, world")
-                RepeatStatus.FINISHED
-            }, transactionManager).build()
+            .tasklet(helloWorldTasklet(), transactionManager)
+            .build()
     }
-}
 
-fun main(args: Array<String>) {
-    runApplication<HelloWorldApplication>(*args)
+    @Bean
+    fun helloWorldTasklet(): Tasklet {
+        return Tasklet { _: StepContribution, context: ChunkContext ->
+            val name: Any? = context.stepContext.jobParameters["name"]
+            log.info("hello, {}!", name)
+            RepeatStatus.FINISHED
+        }
+    }
 }

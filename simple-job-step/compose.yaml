@@ -1,0 +1,9 @@
+services:
+  mysql:
+    image: mysql:8.0.33
+    restart: always
+    environment:
+      - MYSQL_DATABASE=batch
+      - MYSQL_ROOT_PASSWORD=password
+    ports:
+      - 3306:3306

@@ -6,6 +6,7 @@
 
 ![jobinstance-jobexecution.png](./image/jobinstance-jobexecution.png)
 
+
 ### JobLauncher
 
 ![spring-batch-job-component-relation.png](./image/spring-batch-job-component-relation.png)
@@ -14,6 +15,20 @@
 - 잡의 재실행 가능 여부 검증
 - 잡의 실행 방법
 - 파라미터 유효성 검증
+
+> `@EnableBatchProcessing`  
+> 스프링 부트 3 버전 이상부터는 더이상 필요하지 않음  
+> 추가하게 되면 기존의 자동 구성이 사라지게 됨
+
+#### JobRunner
+
+- 잡 이름과 여러 파라미터를 받아 잡을 실행시키는 역할
+- 프레임워크가 제공하는 표준 모듈이 아님
+- 실제 진입점은 잡 러너가 아닌 `JobLanuncher` 의 구현체
+- 두 개의 잡 러너가 존재
+  - `CommandLineJobRunner` (스프링 부트에서는 `JobJauncherCommandLineRunner` 도 제공)
+  - `JobRegistryBackgroundJobRunner`
+
 
 ### JobRepository
 
@@ -36,6 +51,16 @@
 
 - 스텝의 실제 실행
 - JobExecution 은 StepExecution 여러 개와 연관
+
+### JobParameters
+
+- `Map<String, JobParameter>` 객체의 래퍼
+- 타입 이름은 모두 소문자여야 함
+- 타입 변환 기능을 사용하고 싶으면 파라미터 이름 뒤에 괄호를 쓰고 타입을 명시하면 됨
+  - ex) `java -jar demo.jar executionDate(date)=2020/01/01`
+- 잡 파라미터가 식별에 사용되지 않으려면 접두사 `-` 추가
+  - ex) `java -jar demo.jar executionDate(date)=2020/01/01 -name=foo`
+
 
 ## 스텝
 
