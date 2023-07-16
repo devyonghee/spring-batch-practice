@@ -52,19 +52,7 @@
 - 스텝의 실제 실행
 - JobExecution 은 StepExecution 여러 개와 연관
 
-### JobParameters
-
-- `Map<String, JobParameter>` 객체의 래퍼
-- 타입 이름은 모두 **소문자**여야 함
-
-- `JobLauncherCommandLineRunner` 에 파라미터를 전달하기 위해서는 명령행으로 `key=value` 쌍을 전달하면 됨 
-  - ex) `java -jar demo.jar name=test`
-  - 타입 변환 기능을 사용하고 싶으면 파라미터 이름 뒤에 **괄호를 쓰고 타입을 명시**하면 됨
-    - ex) `java -jar demo.jar executionDate(date)=2020/01/01`
-  - 잡 파라미터가 식별에 사용되지 않으려면 **접두사** `-` 추가
-    - ex) `java -jar demo.jar executionDate(date)=2020/01/01 -name=foo`
-  - 명령행 기능을 사용해 프로퍼티 구성하는 것과 다르므로 `--`, `-D` 접두사를 사용하면 안됨
-  - intellij 에서 잡 파라미터를 전달하고 싶다면 `program arguments` 를 이용하면 됨
+### 구성 요소
 
 
 
@@ -84,10 +72,58 @@
         - `ItemWriter` : 데이터를 저장
 
 
-- JobRepository: 실행 중인 잡의 상태를 기록하는 데 사용
-- JobLauncher: 잡을 구동하는 데 사용
-- JobExplorer: JobRepository 을 사용해 읽기 전용 작업을 수행하는데 사용
-- JobRegistry: 특정 런처 구현체를 사용할 때 잡을 찾는 용도
-- PlatformTransactionManager: 잡 진행 과정에서 트랜잭션을 다루는데 사용
-- JobBuilderFactory: 잡을 생성하는 빌더 (`JobBuilder` 로 대체)
-- StepBuilderFactory: 스텝을 생성하는 빌더 (`StepBuilder` 로 대체)
+## 구성 요소
+
+- `JobRepository`
+  - 실행 중인 잡의 상태를 기록하는 데 사용
+- `JobLauncher`
+  - 잡을 구동하는 데 사용
+- `JobExplorer`
+  - JobRepository 을 사용해 읽기 전용 작업을 수행하는데 사용
+- `JobRegistry`
+  - 특정 런처 구현체를 사용할 때 잡을 찾는 용도
+- `PlatformTransactionManager`
+  - 잡 진행 과정에서 트랜잭션을 다루는데 사용
+- `JobBuilderFactory`
+  - 잡을 생성하는 빌더 (`JobBuilder` 로 대체)
+- `StepBuilderFactory`
+  - 스텝을 생성하는 빌더 (`StepBuilder` 로 대체)
+
+- `JobParameters`
+  - `Map<String, JobParameter>` 객체의 래퍼
+  - 타입 이름은 모두 **소문자**여야 함
+  - `JobLauncherCommandLineRunner` 에 파라미터를 전달하기 위해서는 명령행으로 `key=value` 쌍을 전달하면 됨
+    - ex) `java -jar demo.jar name=test`
+    - 타입 변환 기능을 사용하고 싶으면 파라미터 이름 뒤에 **괄호를 쓰고 타입을 명시**하면 됨
+      - ex) `java -jar demo.jar executionDate(date)=2020/01/01`
+    - 잡 파라미터가 식별에 사용되지 않으려면 **접두사** `-` 추가
+      - ex) `java -jar demo.jar executionDate(date)=2020/01/01 -name=foo`
+    - 명령행 기능을 사용해 프로퍼티 구성하는 것과 다르므로 `--`, `-D` 접두사를 사용하면 안됨
+    - intellij 에서 잡 파라미터를 전달하고 싶다면 `program arguments` 를 이용하면 됨
+
+- `JobParametersValidator`
+  - 잡 파라미터의 유효성 검증
+  - 기본적으로 필수 파라미터가 전달됐는지 확인하는 `DefaultJobParametersValidator` 제공
+  - 여러 개의 검증기를 사용하기 위해서는 `CompositeJobParameterValidator` 제공
+
+- `JobParametersIncrementer`
+  - 잡에서 사용할 파라미터를 고유하게 생성할 수 있도록 배치에서 제공하는 인터페이스
+  - `RunIdIncrementer` 을 사용하면 `run.id` 인 `long` 타입 파라미터의 값을 증가
+  - 실행 시마다 타임스탬프를 파라미터로 사용하고 싶다면 직접 구현 필요
+
+- `JobExecutionListener`
+  - 스프링 배치 생명주기의 여러 시점에 로직을 추가할 수 있도록 도와주는 인터페이스
+  - 스텝, 리더, 라이터 등 컴포넌트에도 사용 가능
+  - `JobExecutionListener` 을 구현하지 않아도 `@BeforeJob`, `@AfterJob` 애노테이션 사용 가능
+    - `JobListenerFactoryBean.getListner` 를 통해 `JobExecutionListener` 를 구현한 빈을 등록
+  - `beforeJob`, `afterJob` 두 메서드 제공
+  - 사용 사례
+    - 알림: 잡의 시작이나 종료를 알리는 메세지 큐 생성
+    - 초기화: 잡 실행 전에 뭔가 준비해야 한다면 `beforeJob` 에서 수행
+    - 정리: 잡의 성공/실패와 관계없이 실행 후에 뭔가 정리해야 한다면 `afterJob` 에서 수행
+
+- `ExecutionContext`
+  - 배치 잡의 세션 (간단하게 키-값 쌍을 보관하는 도구)
+  - `JobExecution`, `StepExecution` 의 일부로 잡의 상태를 저장하는 곳
+  - 잡을 다루는 과정에서 여러 개의 `ExecutionContext` 이 존재할 수 있음 
+  - 스텝 간에 데이터를 공유하고 싶다면 `ExecutionContextPromotionlistner` 사용
