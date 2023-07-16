@@ -55,11 +55,17 @@
 ### JobParameters
 
 - `Map<String, JobParameter>` 객체의 래퍼
-- 타입 이름은 모두 소문자여야 함
-- 타입 변환 기능을 사용하고 싶으면 파라미터 이름 뒤에 괄호를 쓰고 타입을 명시하면 됨
-  - ex) `java -jar demo.jar executionDate(date)=2020/01/01`
-- 잡 파라미터가 식별에 사용되지 않으려면 접두사 `-` 추가
-  - ex) `java -jar demo.jar executionDate(date)=2020/01/01 -name=foo`
+- 타입 이름은 모두 **소문자**여야 함
+
+- `JobLauncherCommandLineRunner` 에 파라미터를 전달하기 위해서는 명령행으로 `key=value` 쌍을 전달하면 됨 
+  - ex) `java -jar demo.jar name=test`
+  - 타입 변환 기능을 사용하고 싶으면 파라미터 이름 뒤에 **괄호를 쓰고 타입을 명시**하면 됨
+    - ex) `java -jar demo.jar executionDate(date)=2020/01/01`
+  - 잡 파라미터가 식별에 사용되지 않으려면 **접두사** `-` 추가
+    - ex) `java -jar demo.jar executionDate(date)=2020/01/01 -name=foo`
+  - 명령행 기능을 사용해 프로퍼티 구성하는 것과 다르므로 `--`, `-D` 접두사를 사용하면 안됨
+  - intellij 에서 잡 파라미터를 전달하고 싶다면 `program arguments` 를 이용하면 됨
+
 
 
 ## 스텝
