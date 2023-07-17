@@ -54,26 +54,6 @@
 
 ### 구성 요소
 
-
-
-## 스텝
-
-잡을 구성하는 독립된 작업의 단위  
-태스크릿(tasklet)과 청크(chunk) 기반의 두 가지 스텝 유형 존재
-
-- 태스크릿(tasklet)
-    - 스텝이 중지될 때까지 `execute` 메서드가 반복해서 수행
-    - 초기화, 저장 프로시저 실행, 알림 전송등에 많이 사용
-- 청크(chunk)
-    - 아이템 기반의 처리에 사용
-    - 3개의 주요 부분으로 구성될 수 있음
-        - `ItemReader` : 데이터를 읽어옴
-        - `ItemProcessor` : 데이터를 가공(선택)
-        - `ItemWriter` : 데이터를 저장
-
-
-## 구성 요소
-
 - `JobRepository`
   - 실행 중인 잡의 상태를 기록하는 데 사용
 - `JobLauncher`
@@ -125,5 +105,26 @@
 - `ExecutionContext`
   - 배치 잡의 세션 (간단하게 키-값 쌍을 보관하는 도구)
   - `JobExecution`, `StepExecution` 의 일부로 잡의 상태를 저장하는 곳
-  - 잡을 다루는 과정에서 여러 개의 `ExecutionContext` 이 존재할 수 있음 
+  - 잡을 다루는 과정에서 여러 개의 `ExecutionContext` 이 존재할 수 있음
   - 스텝 간에 데이터를 공유하고 싶다면 `ExecutionContextPromotionlistner` 사용
+
+
+## 스텝
+
+잡을 구성하는 독립된 작업의 단위  
+태스크릿(tasklet)과 청크(chunk) 기반의 두 가지 스텝 유형 존재
+
+- 태스크릿(tasklet)
+    - `Tasklet.execute` 메서드가 `RepeatStatus.FINISHED` 를 반환할 때까지 트랜잭션 범위 내에서 반복 실행
+    - 초기화, 저장 프로시저 실행, 알림 전송등에 많이 사용
+- 청크(chunk)
+  - 아이템 기반의 처리에 사용
+  - 3개의 주요 부분으로 구성될 수 있음
+    - `ItemReader` : 데이터를 읽어옴
+      - 첫번째 루프로 청크 단위로 처리할 모든 레코드를 반복적으로 메모리로 가져옴
+    - `ItemProcessor` : 데이터를 가공(선택)
+      - 메모리로 읽어온 아이템들을 반복적으로 수행
+    - `ItemWriter` : 데이터를 저장
+      - 물리적 쓰기를 일괄적으로 처리
+  ![chunk-sequence-diagram.png](./image/chunk-sequence-diagram.png)
+
