@@ -52,6 +52,7 @@ class HelloWorldParameterJob(
         return JobBuilder("basicJob", jobRepository)
             .start(step1())
             .next(step2())
+            .next(chunkStep())
             .validator(validator())
 //            .incrementer(RunIdIncrementer())
             .incrementer(DailyJobTimestamper)
@@ -174,6 +175,53 @@ class HelloWorldParameterJob(
             setCommand("echo 1")
             setTimeout(5000)
             setInterruptOnCancel(true)
+        }
+    }
+
+    @Bean
+    // chunk 방식
+    fun chunkStep(): Step {
+        return StepBuilder("step2", jobRepository)
+            .chunk<String, String>(10, transactionManager)
+//            .chunk<String, String>(completionPolicy(), transactionManager)
+            .reader(itemReader(InputStreamResource(System.`in`)))
+            .writer(itemWriter((FileSystemResource("output.txt"))))
+            .build()
+    }
+
+    @Bean
+    @StepScope
+    fun itemReader(
+        @Value("#{jobParameters['inputFile']}") inputFile: Resource,
+    ): FlatFileItemReader<String> {
+        return FlatFileItemReaderBuilder<String>()
+            .name("itemReader")
+            .resource(inputFile)
+            .lineMapper(PassThroughLineMapper())
+            .build()
+    }
+
+    @Bean
+    @StepScope
+    fun itemWriter(
+        @Value("#{jobParameters['outputFile']}") outputFile: WritableResource,
+    ): FlatFileItemWriter<String> {
+        return FlatFileItemWriterBuilder<String>()
+            .name("itemWriter")
+            .resource(outputFile)
+            .lineAggregator(PassThroughLineAggregator())
+            .build()
+    }
+
+    @Bean
+    fun completionPolicy(): CompletionPolicy {
+        return CompositeCompletionPolicy().apply {
+            setPolicies(
+                arrayOf(
+                    TimeoutTerminationPolicy(3),
+                    SimpleCompletionPolicy(1000)
+                )
+            )
         }
     }
 }

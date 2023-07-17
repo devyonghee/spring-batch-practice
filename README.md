@@ -128,6 +128,7 @@
 
 - 청크(chunk)
   - 아이템 기반의 처리에 사용
+  - 커밋 간격(commit interval)에 의해 정의
   - 3개의 주요 부분으로 구성될 수 있음
     - `ItemReader` : 데이터를 읽어옴
       - 첫번째 루프로 청크 단위로 처리할 모든 레코드를 반복적으로 메모리로 가져옴
@@ -135,5 +136,9 @@
       - 메모리로 읽어온 아이템들을 반복적으로 수행
     - `ItemWriter` : 데이터를 저장
       - 물리적 쓰기를 일괄적으로 처리
+  - `CompletionPolicy` 를 통해 청크가 완료되는 시점 정의
+    - `SimpleCompletionPolicy`: 처리된 아이템 개수를 세고 구성해둔 임계 값에 도달하면 완료 표시
+    - `TimeoutTerminationPolicy`: 처리 시간이 해당 시간을 넘길 때 완료된 것으로 간주
+    - `CompositeCompletionPolicy`: 여러 정책을 함께 구성 가능
   ![chunk-sequence-diagram.png](./image/chunk-sequence-diagram.png)
 
