@@ -16,11 +16,28 @@ import org.springframework.batch.core.listener.JobListenerFactoryBean
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.core.step.builder.StepBuilder
+import org.springframework.batch.core.step.tasklet.CallableTaskletAdapter
+import org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter
+import org.springframework.batch.core.step.tasklet.SystemCommandTasklet
 import org.springframework.batch.core.step.tasklet.Tasklet
+import org.springframework.batch.item.file.FlatFileItemReader
+import org.springframework.batch.item.file.FlatFileItemWriter
+import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder
+import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder
+import org.springframework.batch.item.file.mapping.PassThroughLineMapper
+import org.springframework.batch.item.file.transform.PassThroughLineAggregator
+import org.springframework.batch.repeat.CompletionPolicy
 import org.springframework.batch.repeat.RepeatStatus
+import org.springframework.batch.repeat.policy.CompositeCompletionPolicy
+import org.springframework.batch.repeat.policy.SimpleCompletionPolicy
+import org.springframework.batch.repeat.policy.TimeoutTerminationPolicy
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.io.FileSystemResource
+import org.springframework.core.io.InputStreamResource
+import org.springframework.core.io.Resource
+import org.springframework.core.io.WritableResource
 import org.springframework.transaction.PlatformTransactionManager
 
 @Configuration
@@ -116,6 +133,47 @@ class HelloWorldParameterJob(
         // step 에서 name 키를 찾으면 잡의 ExecutionContext 에 복사
         return ExecutionContextPromotionListener().apply {
             setKeys(arrayOf("user.name"))
+        }
+    }
+
+    @Bean
+    // CallableTaskletAdapter 를 사용한 Tasklet
+    fun callableTasklet(): CallableTaskletAdapter {
+        return CallableTaskletAdapter().apply {
+            setCallable {
+                log.info("This waw executed in another thread")
+                RepeatStatus.FINISHED
+            }
+        }
+    }
+
+    @Bean
+    @StepScope
+    // MethodInvokingTaskletAdapter 를 사용한 Tasklet
+    fun methodInvokingTaskletAdapter(
+        @Value("#{jobParameters['name']}") name: String,
+    ): MethodInvokingTaskletAdapter {
+        return MethodInvokingTaskletAdapter().apply {
+            setTargetObject(AnyService())
+            setTargetMethod("anyMethod")
+            setArguments(arrayOf(name))
+        }
+    }
+
+    class AnyService {
+
+        fun anyMethod(argument: String) {
+            println("service method was called. argument(`$argument`)")
+        }
+    }
+
+    @Bean
+    // MethodInvokingTaskletAdapter 를 사용한 Tasklet
+    fun systemCommandTasklet(): SystemCommandTasklet {
+        return SystemCommandTasklet().apply {
+            setCommand("echo 1")
+            setTimeout(5000)
+            setInterruptOnCancel(true)
         }
     }
 }

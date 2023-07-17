@@ -117,6 +117,15 @@
 - 태스크릿(tasklet)
     - `Tasklet.execute` 메서드가 `RepeatStatus.FINISHED` 를 반환할 때까지 트랜잭션 범위 내에서 반복 실행
     - 초기화, 저장 프로시저 실행, 알림 전송등에 많이 사용
+    - 구현 방법에는 두 가지 유형이 존재
+      - `Tasklet` 인터페이스의 `execute` 메서드 구현하여 `RepeatStatus` 반환하여 정의 가능
+        - `RepeatStatus.CONTINUABLE`: 잡을 계속 수행하는 것이 아닌 해당 태스크릿을 다시 실행
+        - `RepeatStatus.FINISHED`: 처리의 성공 여부에 관계 없이 처리를 완료하고 다음처리를 이어서 함
+      - 다른 유형의 태스크릿
+        - `CallableTaskletAdapter`: `java.util.concurrent.Callable<RepeatStatus>` 의 구현체를 구성할 수 있게 해주는 어댑터
+        - `MethodInvokingTaskletAdapter`: 다른 클래스 내의 메서드를 잡 내의 태스크릿처럼 실행
+        - `SystemCommandTasklet`: 시스템 명령을 비동기로 실행
+
 - 청크(chunk)
   - 아이템 기반의 처리에 사용
   - 3개의 주요 부분으로 구성될 수 있음
