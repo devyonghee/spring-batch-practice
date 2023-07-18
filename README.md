@@ -152,3 +152,30 @@
 - 인터페이스 구현을 간단히 할 수 있도록 애노테이션도 제공
   - `@BeforeStep`, `@AfterStep` (`AfterStep`만 `ExitStaus` 반환)
   - `@BeforeChunk`, `@AfterChunk`
+
+### 조건 로직
+
+잡 내에서 `StepBuilder` 의 `next` 메서드 뿐만 아닌 전이(translation) 구성으로 다른 순서로 실행   
+
+- `on` 메서드는 스프링 배치가 스텝의 `ExitStatus` 를 확인하여 다음 스텝을 결정
+  - `*` 은 0개 이상의 문자를 일치 (ex. `C*` 는 `C`, `COMPLITE`, `CORRECT` 일치)
+  - `?` 는 1개의 문자를 일치 (ex. `?AT` 는 `CAT`, `KAT` 일치)
+
+- `JobExecutionDecider`: 특정 스텝을 실행 여부 판단
+
+### 잡 종료하기
+
+잡을 종료할 때 세 가지 상태로 종료 가능
+
+- `Completed`
+  - 스프링 배치 처리가 성공적으로 종료
+  - 동일한 파라미터로 재실행 불가
+  - 스텝에서 반환된 상태와 무관하게 `Completed` 상태로 잡을 종료하려면 `end` 메서드 사용
+- `Failed`
+  - 잡이 성공적으로 완료되지 않음
+  - 동일한 파라미터로 재실행 가능
+  - `Failed` 상태로 잡을 종료하려면 `fail` 메서드 사용
+- `Stoped`
+  - 잡을 중단하고 중단된 위치에서 다시 시작 가능
+  - 사람의 개입이나 검사, 처리가 필요한 상황에 유용
+

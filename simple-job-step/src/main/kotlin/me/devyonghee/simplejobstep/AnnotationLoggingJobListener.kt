@@ -6,7 +6,7 @@ import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.annotation.AfterJob
 import org.springframework.batch.core.annotation.BeforeJob
 
-object AnnotationJobLoggerListener {
+object AnnotationLoggingJobListener {
 
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
