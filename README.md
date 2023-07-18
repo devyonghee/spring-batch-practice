@@ -142,3 +142,13 @@
     - `CompositeCompletionPolicy`: 여러 정책을 함께 구성 가능
   ![chunk-sequence-diagram.png](./image/chunk-sequence-diagram.png)
 
+### 스텝 리스너
+
+스텝 리스너도 잡 리스너와 동일하게 시작 및 종료 이벤트를 처리하지만 개별 스텝에서 이뤄짐
+
+- 두 인터페이스가 존재 (`StepListener` 는 마커 인터페이스) 
+  - `StepExecutionListener`
+  - `ChunkListener`
+- 인터페이스 구현을 간단히 할 수 있도록 애노테이션도 제공
+  - `@BeforeStep`, `@AfterStep` (`AfterStep`만 `ExitStaus` 반환)
+  - `@BeforeChunk`, `@AfterChunk`

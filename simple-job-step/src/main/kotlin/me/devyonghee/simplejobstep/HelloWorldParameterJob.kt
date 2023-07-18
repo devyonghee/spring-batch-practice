@@ -57,7 +57,7 @@ class HelloWorldParameterJob(
 //            .incrementer(RunIdIncrementer())
             .incrementer(DailyJobTimestamper)
 //            .listener(JobLoggerListener)
-            .listener(JobListenerFactoryBean.getListener(AnnotationJobLoggerListener))
+            .listener(JobListenerFactoryBean.getListener(AnnotationLoggingJobListener))
             .build()
     }
 
@@ -89,6 +89,7 @@ class HelloWorldParameterJob(
     fun step2(): Step {
         return StepBuilder("step2", jobRepository)
             .tasklet(goodByeTasklet(), transactionManager)
+            .listener(AnnotationLoggingStepListener)
             .build()
     }
 
@@ -185,7 +186,7 @@ class HelloWorldParameterJob(
             .chunk<String, String>(10, transactionManager)
 //            .chunk<String, String>(completionPolicy(), transactionManager)
             .reader(itemReader(InputStreamResource(System.`in`)))
-            .writer(itemWriter((FileSystemResource("output.txt"))))
+            .writer(itemWriter(FileSystemResource("output.txt")))
             .build()
     }
 
