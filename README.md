@@ -160,7 +160,6 @@
 - `on` 메서드는 스프링 배치가 스텝의 `ExitStatus` 를 확인하여 다음 스텝을 결정
   - `*` 은 0개 이상의 문자를 일치 (ex. `C*` 는 `C`, `COMPLITE`, `CORRECT` 일치)
   - `?` 는 1개의 문자를 일치 (ex. `?AT` 는 `CAT`, `KAT` 일치)
-
 - `JobExecutionDecider`: 특정 스텝을 실행 여부 판단
 
 ### 잡 종료하기
@@ -178,4 +177,21 @@
 - `Stoped`
   - 잡을 중단하고 중단된 위치에서 다시 시작 가능
   - 사람의 개입이나 검사, 처리가 필요한 상황에 유용
+
+### 스텝 순서 외부화하기
+
+스텝의 순서 외부화하는 세 가지 방법이 존재
+
+- 스텝의 시퀀스를 독자적인 플로우로 생성 
+
+- 플로우 스텝을 사용
+   - 플로우를 잡 빌더로 전달하는 것과 비슷
+   - 하나의 스텝처럼 기록하기 때문에 개별 스텝을 집계하지 않아도 플로우의 영향을 전체적으로 확인 가능  
+
+- 잡내에서 다른 잡 호출
+  - `JobParameterExtractor`: 상위 잡의 `JobParameters` 또는 `ExecutionContext` 에서 하위 잡으로 전달하는 클래스
+    - `DefaultJobParameterExtractor` 는 `JobParameters`와 `ExecutionContext` 모두 확인함
+  - 서브 잡은 자체적으로 `Jobinstance`, `ExecutionContext` 및 관련 데이터를 가짐
+    - 다른 잡과 동일하게 `JobRepository` 내에서 식별
+  - 잡 스텝으로 잡을 트리로 만들어 관리하면 제약이 생겨 문제를 일으킬 수 있음
 

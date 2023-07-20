@@ -28,6 +28,7 @@ class ConditionalJob(
         return JobBuilder("conditionalJob", jobRepository)
             .start(conditionalFirstStep())
             .next(RandomDecider)
+            // FAILED 로 잡이 종료되지만, 재구동하면 successStep 에서부터 재실행
             .from(RandomDecider).on(ExitStatus.FAILED.exitCode).stopAndRestart(successStep())
             .from(RandomDecider).on("*").to(successStep())
             .end()
