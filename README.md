@@ -195,3 +195,103 @@
     - 다른 잡과 동일하게 `JobRepository` 내에서 식별
   - 잡 스텝으로 잡을 트리로 만들어 관리하면 제약이 생겨 문제를 일으킬 수 있음
 
+## JobRepository
+
+스프링 배치 내에서 `JobRepository` 는 두 가지 의미를 가짐
+스프링 배치는 잡 내에서 사용할 수 있는 **인메모리**, **관계형 데이터베이스** 저장소를 제공
+
+- `JobRepository` 인터페이스
+- `JobRepository` 인터페이스를 구현한 데이터 저장소
+
+### 저장소 유형
+
+#### 관계형 데이터베이스 저장소
+
+스프링 배치에서 기본적으로 사용되는 `JobRepository`  
+
+- `BATCH_JOB_INSTANCE`
+  - 시작점, 고유 정보가 포함된 잡 파라미터로 실행하면 단일 `JobInstance` 가 레코드로 등록
+  - `JOB_INSTANCE_ID`: 기본키
+  - `VERSION`: 낙관적인 락(optimistic locking) 에 사용되는 레코드 버전
+  - `JOB_NAME`: 실행된 잡의 이름
+  - `JOB_KEY`: 잡 이름과 잡 파라미터의 해시 값, `JobInstance`를 고유하게 식별하는 데 사용
+
+- `BATCH_JOB_EXECUTION`
+  - 배치 잡의 실제 실행 기록
+  - `EXIT_CODE`: 잡 실행의 종료 코드
+  - `EXIT_MESSAGE`: `EXIT_CODE`와 관련된 메시지나 스택 트레이스 
+
+- `BATCH_JOB_EXECUTION_CONTEXT`
+  - `JobExecution` 의 `ExecutionContext` 저장
+  - `SHORT_CONTEXT`: 트림 처리된 `SERIALIZED_CONTEXT`
+  - `SERIALIZED_CONTEXT`: `ExecutionContext` 를 직렬화한 값
+    - 직렬화하는 방법에는 몇 가지 방법이 있지만 스프링 배치 4버전 Jackson2 를 기본적으로 사용 (직렬화 구성을 커스터마이징도 가능)
+
+- `BATCH_JOB_EXECUTION_PAARAMS`
+  - 실행될 때마다 사용된 잡 파라미터 저장
+  - `PARAMETER_TYPE`: 파라미터 값의 타입
+  - `PARAMETER_NAME` : 파라미터 이름
+  - `IDENTIFYING`: 파라미터가 식별되는지 여부를 나타내는 플래그
+  
+- `BATCH_STEP_EXECUTION`
+  - 스텝의 시작, 완료, 상태에 대한 메타데이터 저장 (읽기 횟수, 처리 횟수, 쓰기 횟수, 건너뛰기 횟수 등과 같은 모든 데이터 저장)
+  - `COMMIT_COUNT`: 커밋된 트랜잭션 수
+  - `READ_COUNT`: 읽은 아이템 수
+  - `FILTER_COUNT`: 아이템 프로세서가 `null` 을 반환해 필터링된 아이템 수
+  - `WRITE_COUNT`: 기록된 아이템 수
+  - `READ_SKIP_COUNT`: `ItemReader` 내에서 예외가 던져졌을 때 건너뛴 아이템 수
+  - `PROCESS_SKIP_COUNT`: `ItemProcessor` 내에서 예외가 던져졌을 때 건너뛴 아이템 수
+  - `WRITE_SKIP_COUNT`: `ItemWriter` 내에서 예외가 던져졌을 때 건너뛴 아이템 수
+
+- `BATCH_STEP_EXECUTION_CONTEXT`
+  - 스텝 수준에서 컴포넌트의 상태를 저장하는 데 사용
+  - `SHORT_CONTEXT`: 트림 처리된 `SERIALIZED_CONTEXT`
+  - `SERIALIZED_CONTEXT`: `ExecutionContext` 를 직렬화한 값
+
+
+#### 인메모리 저장소
+
+잡을 개발하거나 단위 테스트를 수행할 때 외부 데이터베이스를 구성하는 작업에 문제 발생    
+그래서 스프링 배치는 `Map` 객체를 저장소를 사용하는 `JobRepository` 구현체를 제공 
+
+
+### 배치 인프라스트럭처 구성하기 
+
+`BatchConfigurer` 인터페이스를 사용하면 `JobRepository` 를 비롯한 스프링 배치 인프라스트럭처 커스터마이징 가능 
+
+#### `BatchConfigurer` 인터페이스
+
+스프링 배치 인프라스트럭처 컴포넌트의 구성을 커스터마이징하는 데 사용되는 전략 인터페이스  
+보통 모든 인터페이스를 구현하지 않고 `DefaultBatchConfigurer` 를 상속하여 적절한 메서드를 재정의  
+
+
+#### `JobRepository` 커스터마이징
+
+`JobRepository` 은 `JobRepositoryFactoryBean` 에서 생성
+
+- `setClobType(int type)`
+  - CLOB 칼럼에 사용할 타입 지정
+- `setSerializer(ExecutionContextSerializer serializer)`
+  - `ExecutionContext` 를 직렬화하고 역직렬화 하는 데 사용
+- `setLobHandler(LobHandler lobHandler)`
+  - `LOB` 를 특별하게 취급해야 하는 경우 사용
+- `setMaxVarCharLength(int maxLength)`
+  - 짧은 실행 컨텍스트, 종료 메시지의 길이를 자르는 데 사용
+  - 스키마를 변경하지 않는다면 설정하면 안됨
+- `setDataSource`
+  - `JobRepository` 와 함께 사용할 데이터 소스 설정
+- `setJdbcOperations`
+  - `JdbcOperations` 인스턴스를 지정
+- `setDatabaseType`
+  - 데이터베이스 유형 설정
+- `setTablePrefix`
+  - 모든 테이블의 접두어 설정 (기본값: `BATCH_`)
+- `setIncrementerFactory`
+  - 대부분의 테이블의 기본 키를 증분하는 데 사용되는 증분기
+- `setValidateTransactionState`
+  - `JobExecution` 이 생성될 때 기존 트랜잭션이 있는지 여부
+- `setIsolationLevelForCreate`
+  - 트랜잭션 직렬화 수준을 지정 (기본값: `ISOLATION_SERIALIZABLE`)
+- `setTransactionManager`
+  - 복수 개의 데이터베이스를 사용하면 동기화할 수 있도록 2단계 커밋을 지원하는 트랜잭션 매니저를 지정
+
