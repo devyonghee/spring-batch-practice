@@ -295,3 +295,67 @@
 - `setTransactionManager`
   - 복수 개의 데이터베이스를 사용하면 동기화할 수 있도록 2단계 커밋을 지원하는 트랜잭션 매니저를 지정
 
+#### `TransactionManager` 커스터마이징
+
+배치처리에 사용할 `TransactionManager`  
+`TransactionManager` 가 생성되지 않은 경우에는 `DefaultBatchConfigurer` 가 기본적으로 `DataSourceTransactionManager` 를 생성
+
+#### `JobExplorer` 커스터마이징
+
+`JobExplorer` 는 배치 메타데이터를 읽기 전용으로 제공  
+`JobExplorer` 는 `JobRepository` 가 다루는 데이터와 동일한 데이터를 읽기 전용으로만 보는 뷰
+
+#### `JobLauncher` 커스터마이징
+
+스프링 부트는 기본적으로 `SimpleJobLauncher` 를 사용  
+대부분 커스터마이징할 필요는 없지만, 별도의 방식으로 구동하는 방법을 제공하려면 조정이 필요함
+
+- `setJobRepository(JobRepository jobRepository)`
+  - `JobRepository` 를 지정
+- `setTaskExecutor(TaskExecutor taskExecutor)`
+  - `JobLauncher` 에 사용할 `TaskExecutor` 지정 (기본값: `SyncTaskExecutor`)
+
+#### 데이터베이스 구성하기
+
+`initialize-schema` 옵션을 사용하면 스프링 배치가 데이터베이스를 구성하는 데 필요한 SQL을 실행할 수 있음
+
+- `always`
+  - 애플리케이션을 실행할 때마다 스크립트 실행
+  - `drop` 문은 없고 오류가 발생되면 무시
+  - 개발 환경에서 사용하기 쉬운 옵션
+- `never`
+  - 스크립트 실행하지 않음
+- `embedded`
+  - 내장 데이터베이스를 사용할 때 사용
+  - 실행 시마다 데이터가 초기화된 데이터베이스 인스턴스를 사용한다는 가정으로 스크립트 실행
+
+### 잡 메타데이터 사용하기
+
+스프링 배치 메타데이터는에 접근하는 주된 방법은 `JobExplorer` 사용
+
+#### `JobExplorer`
+
+`JobExplorer` 는 `JobRepository` 에 있는 이력이나 최신 데이터에 접근하는 시작점  
+`JobRepository` 는 잡 실행과 관련된 저장된 정보에 접근하지만, `JobExplorer` 는 데이터베이스에 직접 접근
+
+![job-component-relation.png](./image/job-component-relation.png)
+
+- `Set<JobExecution> findRunningJobExecutions(String jobName)`
+  - 종료 시간이 존재하지 않는 모든 `JobExecution` 을 반환
+- `List<JobInstance> findJobInstancesByName(String name, int start, int count)`
+  - 전달받은 이름을 가진 `JobInstance` 목록 반환
+- `JobExecution getJobExecution(Long executionId)`
+  - 전달받은 ID 를 가진 `JobExecution` 반환, 존재하지 않으면 `null` 반환
+- `List<JobExecution> getJobExecutions(JobInstance jobInstance)`
+  - 전달받은 `JobInstance` 관련된 모든 `JobExecution` 반환
+- `JobInstance getJobInstance(Long instanceId)`
+  - 전달받은 ID 를 가진 `JobInstance` 반환, 존재하지 않으면 `null` 반환
+- `List<JobInstance> getJobInstances(String jobName, int start, int count)`
+  - 전달받은 인덱스부터 개수만큼의 범위 내에 있는 `JobInstance` 목록 반환
+- `int getJobInstanceCount(String jobName)`
+  - 전달받은 이름을 가진 `JobInstance` 의 개수 반환
+- `List<String> getJobNames()`
+  - `JobRepository` 에 저장된 모든 잡 이름을 알파벳 순서대로 반환
+- `StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId)`
+  - 전달받은 `StepExecution`의 ID와 부모 `JobInstance`의 ID를 가진 `StepExecution` 반환
+
