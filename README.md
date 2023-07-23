@@ -359,3 +359,17 @@
 - `StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId)`
   - 전달받은 `StepExecution`의 ID와 부모 `JobInstance`의 ID를 가진 `StepExecution` 반환
 
+## 잡 실행하기
+
+- 스프링 부트를 스프링 배치와 사용하면 `JobLauncherCommandLineRunner` 을 사용  
+  - `JobLauncherCommandLineRunner` 는 `JobLauncher` 를 사용해서 잡을 실행
+  - `JobLauncher` 에는 `run` 메서드 하나만 존재 (잡에 전달할 잡 파라미터를 인자로 전달)
+  - 기본적으로 `SimpleJobLauncher` 는 동기식 `TaskExecutor` 를 사용해 동기식으로 실행
+
+- REST 호출이나 특정 이벤트 등으로 배치 잡을 실행할 계획이라면 잡이 실행되지 않도록 설정 필요
+  - `spring.batch.job.enabled` 프로퍼티를 `false` 로 설정
+  - `JobParametersIncrementer` 을 사용할 때 변경 사항 적용은 `JobLauncher` 에서 처리
+    - 파라미터가 잡에 전달되면 더 이상 변경할 수 없으므로 `JobParametersBuilder` 의 `getNextJobParameters` 메서드 사용
+
+- 여러 잡이 정의되어 있는 상태에서 특정 잡만 실행하고 싶으면 실행할 잡 이름을 지정
+  - `spring.batch.job.names=job1,job2`
