@@ -386,4 +386,30 @@
 
 - 중지 트랜지션 사용하기
   - 중지 트랜지션을 사용해 중지하도록 구성 및 재시작 위치 지정
+  - `stopAndRestart` 로 특정 `ExistStatus` 처리
+  - 효과적이지만 잡의 트랜지션을 구성하고 스텝의 `ExistStatus` 정의 필요
+    - [TransactionReader.kt](account-transaction-job%2Fsrc%2Fmain%2Fkotlin%2Fme%2Fdevyonghee%2Faccounttransactionjob%2FTransactionReader.kt) 의 `afterStep` 메서드
 
+- StepExecution 을 사용해 중지하기
+  - `afterStep` 메서드 대신 `beforeStep` 메서드를 사용해 `StepExecution` 가져오기
+  - `StepExecution` 의 `setTerminateOnly` 메서드를 사용해 중지
+
+### 오류 처리
+
+- 잡 실패
+  - 중지 방식과 다르게 스텝과 잡에 `ExistStatus.FAILED` 레이블이 지정
+  - `ExistStatus.FAILED` 로 식별되면 스프링 배치는 해당 스텝을 처음부터 다시 시작하지 않음
+  - 잡을 재시작하면 중단됐던 부분을 가져옴
+    - 10개 청크 처리중 2번째 청크의 4번째 항목에서 에러가 발생되면 2번째 청크의 1~4번째 아이템은 롤백, 청크 1은 건너뜀
+
+### 재시작 제어하기
+
+- 재시작 방지하기
+  - 실패하거나 중지될 때 다시 실행하면 안 되는 잡이 있다면 `JobBuilder` 의 `preventRestart` 호출
+
+- 재시작 횟수 제한하기
+  - 재시작 횟수를 제한하고 싶다면 `Step` 수준에서 제공하는 `startLimit` 으로 지정
+
+### 완료된 스텝 재실행하기
+
+- 스텝이 완료됐더라도 다시 실행하려면 `allowStartIfComplete` 를 `true` 로 설정
