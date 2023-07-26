@@ -1,4 +1,8 @@
-Aimee,C,Hoover,7341,Vel Avenue,Mobile,AL,35928
-Jonas,U,Gilbert,8852,In St.,Saint Paul,MN,57321
-Regan,M,Baxter,4851,Nec Av.,Gulfport,MS,33193
-Michael,T,Minella,#123,4th Street#,Chicago,IL,60606
+CUST,Aimee,C,Hoover,7341,Vel Avenue,Mobile,AL,35928
+TRANS,1165965,2011-01-22 00:13:29,51.43
+CUST,Jonas,U,Gilbert,8852,In St.,Saint Paul,MN,57321
+CUST,Regan,M,Baxter,4851,Nec Av.,Gulfport,MS,33193
+CUST,Michael,T,Minella,#123,4th Street#,Chicago,IL,60606
+TRANS,8116369,2011-01-21 20:40:52,-14.83
+TRANS,8116369,2011-01-22 15:50:17,-45.45
+TRANS,8116369,2011-01-22 16:52:46,-74.6

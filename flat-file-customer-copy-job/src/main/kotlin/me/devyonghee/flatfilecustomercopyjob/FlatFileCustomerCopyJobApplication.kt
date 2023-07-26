@@ -11,6 +11,9 @@ import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.batch.item.ItemWriter
 import org.springframework.batch.item.file.FlatFileItemReader
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder
+import org.springframework.batch.item.file.mapping.PatternMatchingCompositeLineMapper
+import org.springframework.batch.item.file.transform.DelimitedLineTokenizer
+import org.springframework.batch.item.file.transform.LineTokenizer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -36,13 +39,13 @@ class FlatFileCustomerCopyJobApplication(
     @Bean
     fun copyFileStep(): Step {
         return StepBuilder("copyFileStep", jobRepository)
-            .chunk<Customer, Customer>(10, transactionManager)
+            .chunk<CustomerLineType, CustomerLineType>(10, transactionManager)
             .reader(customerItemReader(PathResource("")))
             .writer(itemWriter())
             .build()
     }
 
-    fun itemWriter(): ItemWriter<Customer> {
+    fun itemWriter(): ItemWriter<CustomerLineType> {
         return ItemWriter { items ->
             items.forEach { log.info("write customer `{}`", it) }
         }
@@ -52,12 +55,12 @@ class FlatFileCustomerCopyJobApplication(
     @StepScope
     fun customerItemReader(
         @Value("#{jobParameters['customerFile']}") inputFile: Resource,
-    ): FlatFileItemReader<Customer> {
-        return FlatFileItemReaderBuilder<Customer>()
+    ): FlatFileItemReader<CustomerLineType> {
+        return FlatFileItemReaderBuilder<CustomerLineType>()
             .name("customerItemReader")
             .resource(inputFile)
             // 구분자가 있는 경우
-            .delimited()
+            //.delimited()
             // 고정된 길이인 경우
             //.fixedLength()
             //.columns(
@@ -70,7 +73,58 @@ class FlatFileCustomerCopyJobApplication(
             //    Range(63, 64),
             //    Range(65, 69),
             //)
-            .names(
+            //.names(
+            //    "firstName",
+            //    "middleInitial",
+            //    "lastName",
+            //    "addressNumber",
+            //    "street",
+            //    "city",
+            //    "state",
+            //    "zipCode",
+            //)
+            // 커스텀 구분자를 사용하는 경우
+            // .lineTokenizer(CustomerFileLineTokenizer)
+            // .fieldSetMapper(CustomerFieldSetMapper())
+            .lineMapper(lineTokenizer())
+            .build()
+    }
+
+    @Bean
+    fun lineTokenizer(): PatternMatchingCompositeLineMapper<CustomerLineType> {
+        return PatternMatchingCompositeLineMapper<CustomerLineType>().apply {
+            setTokenizers(
+                mapOf(
+                    "CUST*" to customerLineTokenizer(),
+                    "TRANS*" to transactionLineTokenizer(),
+                )
+            )
+            setFieldSetMappers(
+                mapOf(
+                    "CUST*" to CustomerFieldSetMapper,
+                    "TRANS*" to TransactionFieldSetMapper,
+                )
+            )
+        }
+    }
+
+    @Bean
+    fun transactionLineTokenizer(): LineTokenizer {
+        return DelimitedLineTokenizer().apply {
+            setNames(
+                "prefix",
+                "accountNumber",
+                "transactionDate",
+                "amount",
+            )
+        }
+    }
+
+    @Bean
+    fun customerLineTokenizer(): LineTokenizer {
+        return DelimitedLineTokenizer().apply {
+            setIncludedFields(*(1..8).toSet().toIntArray())
+            setNames(
                 "firstName",
                 "middleInitial",
                 "lastName",
@@ -79,8 +133,8 @@ class FlatFileCustomerCopyJobApplication(
                 "city",
                 "state",
                 "zipCode",
-            ).fieldSetMapper(CustomerFieldSetMapper())
-            .build()
+            )
+        }
     }
 }
 

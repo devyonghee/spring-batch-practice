@@ -3,7 +3,7 @@ package me.devyonghee.flatfilecustomercopyjob
 import org.springframework.batch.item.file.mapping.FieldSetMapper
 import org.springframework.batch.item.file.transform.FieldSet
 
-class CustomerFieldSetMapper : FieldSetMapper<Customer> {
+object CustomerFieldSetMapper : FieldSetMapper<CustomerLineType> {
 
     override fun mapFieldSet(fieldSet: FieldSet): Customer {
         return Customer(
