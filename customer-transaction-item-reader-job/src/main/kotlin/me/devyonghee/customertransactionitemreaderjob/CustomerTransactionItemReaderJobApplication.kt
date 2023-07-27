@@ -7,7 +7,8 @@ import org.springframework.boot.runApplication
 class CustomerTransactionItemReaderJobApplication
 
 fun main(args: Array<String>) {
-    val jobArgs = arrayOf("--job.name=flatFileJob", "customerFile=input/customer*")
+    // val jobArgs = arrayOf("--job.name=flatFileJob", "customerFile=input/customerFile*")
+    val jobArgs = arrayOf("--job.name=xmlFileJob", "customerFile=input/customer.xml")
 
     runApplication<CustomerTransactionItemReaderJobApplication>(*args, *jobArgs)
 }
