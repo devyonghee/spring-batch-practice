@@ -1,5 +1,7 @@
-package me.devyonghee.flatfilecustomercopyjob
+package me.devyonghee.customertransactionitemreaderjob.flatfile
 
+import me.devyonghee.customertransactionitemreaderjob.domain.Customer
+import me.devyonghee.customertransactionitemreaderjob.domain.CustomerLineType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.batch.core.Job
@@ -8,39 +10,39 @@ import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
+import org.springframework.batch.item.ItemStreamReader
 import org.springframework.batch.item.ItemWriter
 import org.springframework.batch.item.file.FlatFileItemReader
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder
+import org.springframework.batch.item.file.builder.MultiResourceItemReaderBuilder
 import org.springframework.batch.item.file.mapping.PatternMatchingCompositeLineMapper
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer
 import org.springframework.batch.item.file.transform.LineTokenizer
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
-import org.springframework.core.io.PathResource
+import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.Resource
 import org.springframework.transaction.PlatformTransactionManager
 
-@SpringBootApplication
-class FlatFileCustomerCopyJobApplication(
+@Configuration
+class FlatFileCustomerCopyJobConfiguration(
     private val jobRepository: JobRepository,
     private val transactionManager: PlatformTransactionManager,
 ) {
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     @Bean
-    fun job(): Job {
-        return JobBuilder("job", jobRepository)
-            .start(copyFileStep())
+    fun flatFileJob(): Job {
+        return JobBuilder("flatFileJob", jobRepository)
+            .start(flatFileCopyFileStep())
             .build()
     }
 
     @Bean
-    fun copyFileStep(): Step {
-        return StepBuilder("copyFileStep", jobRepository)
+    fun flatFileCopyFileStep(): Step {
+        return StepBuilder("flatFileCopyFileStep", jobRepository)
             .chunk<CustomerLineType, CustomerLineType>(10, transactionManager)
-            .reader(customerItemReader(PathResource("")))
+            .reader(flatFileMultiCustomerReader(arrayOf()))
             .writer(itemWriter())
             .build()
     }
@@ -53,12 +55,27 @@ class FlatFileCustomerCopyJobApplication(
 
     @Bean
     @StepScope
-    fun customerItemReader(
-        @Value("#{jobParameters['customerFile']}") inputFile: Resource,
-    ): FlatFileItemReader<CustomerLineType> {
+    fun flatFileMultiCustomerReader(
+        @Value("#{jobParameters['customerFile']}") inputFiles: Array<Resource>,
+    ): ItemStreamReader<Customer?> {
+        return MultiResourceItemReaderBuilder<Customer?>()
+            .name("flatFileMultiCustomerItemReader")
+            .resources(*inputFiles)
+            .delegate(flatFileCustomerFileReader())
+            .build()
+    }
+
+    @Bean
+    fun flatFileCustomerFileReader(): CustomerFileReader {
+        return CustomerFileReader(flatFileCustomerItemReader())
+    }
+
+    @Bean
+    @StepScope
+    fun flatFileCustomerItemReader(): FlatFileItemReader<CustomerLineType> {
         return FlatFileItemReaderBuilder<CustomerLineType>()
             .name("customerItemReader")
-            .resource(inputFile)
+            //.resource(inputFile)
             // 구분자가 있는 경우
             //.delimited()
             // 고정된 길이인 경우
@@ -86,17 +103,17 @@ class FlatFileCustomerCopyJobApplication(
             // 커스텀 구분자를 사용하는 경우
             // .lineTokenizer(CustomerFileLineTokenizer)
             // .fieldSetMapper(CustomerFieldSetMapper())
-            .lineMapper(lineTokenizer())
+            .lineMapper(flatFileLineTokenizer())
             .build()
     }
 
     @Bean
-    fun lineTokenizer(): PatternMatchingCompositeLineMapper<CustomerLineType> {
+    fun flatFileLineTokenizer(): PatternMatchingCompositeLineMapper<CustomerLineType> {
         return PatternMatchingCompositeLineMapper<CustomerLineType>().apply {
             setTokenizers(
                 mapOf(
-                    "CUST*" to customerLineTokenizer(),
-                    "TRANS*" to transactionLineTokenizer(),
+                    "CUST*" to flatFileCustomerLineTokenizer(),
+                    "TRANS*" to flatFileTransactionLineTokenizer(),
                 )
             )
             setFieldSetMappers(
@@ -109,7 +126,7 @@ class FlatFileCustomerCopyJobApplication(
     }
 
     @Bean
-    fun transactionLineTokenizer(): LineTokenizer {
+    fun flatFileTransactionLineTokenizer(): LineTokenizer {
         return DelimitedLineTokenizer().apply {
             setNames(
                 "prefix",
@@ -121,7 +138,7 @@ class FlatFileCustomerCopyJobApplication(
     }
 
     @Bean
-    fun customerLineTokenizer(): LineTokenizer {
+    fun flatFileCustomerLineTokenizer(): LineTokenizer {
         return DelimitedLineTokenizer().apply {
             setIncludedFields(*(1..8).toSet().toIntArray())
             setNames(
@@ -136,9 +153,4 @@ class FlatFileCustomerCopyJobApplication(
             )
         }
     }
-}
-
-
-fun main(args: Array<String>) {
-    runApplication<FlatFileCustomerCopyJobApplication>(*args)
 }

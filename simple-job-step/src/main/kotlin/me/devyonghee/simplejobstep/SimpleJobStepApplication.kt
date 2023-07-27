@@ -7,6 +7,6 @@ import org.springframework.boot.runApplication
 class SimpleJobStepApplication
 
 fun main(args: Array<String>) {
-    runApplication<SimpleJobStepApplication>(*args)
+    runApplication<SimpleJobStepApplication>(*args, "name=name", "fileName=test.csv")
 }
 

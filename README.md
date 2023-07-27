@@ -426,4 +426,4 @@
 
 - `FlatFileItemReader`
   - 플랫 파일: 한 개 또는 그 이상의 레코드가 포함된 특정 파일
-  - 커스텀 구분자를 사용하기 위해서는 `LineTokenizer` 사용 
+  - 커스텀 구분자를 사용하기 위해서는 `LineTokenizer` 사용

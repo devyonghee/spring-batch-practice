@@ -1,4 +1,4 @@
-package me.devyonghee.flatfilecustomercopyjob
+package me.devyonghee.customertransactionitemreaderjob.flatfile
 
 import org.springframework.batch.item.file.transform.DefaultFieldSetFactory
 import org.springframework.batch.item.file.transform.FieldSet
