@@ -1,8 +1,5 @@
 package me.devyonghee.customertransactionitemreaderjob.xmlfile
 
-import me.devyonghee.customertransactionitemreaderjob.domain.Customer
-import me.devyonghee.customertransactionitemreaderjob.domain.CustomerLineType
-import me.devyonghee.customertransactionitemreaderjob.domain.Transaction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.batch.core.Job
@@ -40,13 +37,13 @@ class XmlFileCustomerCopyJobConfiguration(
     @Bean
     fun xmlFileCopyFileStep(): Step {
         return StepBuilder("xmlFileCopyFileStep", jobRepository)
-            .chunk<CustomerLineType, CustomerLineType>(10, transactionManager)
+            .chunk<CustomerXml, CustomerXml>(10, transactionManager)
             .reader(xmlFileCustomerReader(ClassPathResource("")))
             .writer(itemWriter())
             .build()
     }
 
-    fun itemWriter(): ItemWriter<CustomerLineType> {
+    fun itemWriter(): ItemWriter<CustomerXml> {
         return ItemWriter { items ->
             items.forEach { log.info("write customer `{}`", it) }
         }
@@ -56,8 +53,8 @@ class XmlFileCustomerCopyJobConfiguration(
     @StepScope
     fun xmlFileCustomerReader(
         @Value("#{jobParameters['customerFile']}") inputFile: Resource,
-    ): ItemStreamReader<Customer?> {
-        return StaxEventItemReaderBuilder<Customer?>()
+    ): ItemStreamReader<CustomerXml?> {
+        return StaxEventItemReaderBuilder<CustomerXml?>()
             .name("xmlFileCustomerReader")
             .resource(inputFile)
             .addFragmentRootElements("customer")
@@ -68,7 +65,7 @@ class XmlFileCustomerCopyJobConfiguration(
     @Bean
     fun customerMarshaller(): Unmarshaller {
         return Jaxb2Marshaller().apply {
-            setClassesToBeBound(Customer::class.java, Transaction::class.java)
+            setClassesToBeBound(CustomerXml::class.java, TransactionXml::class.java)
         }
     }
 }
