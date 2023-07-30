@@ -1,4 +1,4 @@
-package me.devyonghee.customertransactionitemreaderjob.xmlfile
+package me.devyonghee.filecustomertransactionitemreaderjob.xmlfile
 
 import java.util.Date
 

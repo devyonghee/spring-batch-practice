@@ -1,7 +1,5 @@
-package me.devyonghee.customertransactionitemreaderjob.flatfile
+package me.devyonghee.filecustomertransactionitemreaderjob.flatfile
 
-import me.devyonghee.customertransactionitemreaderjob.domain.Customer
-import me.devyonghee.customertransactionitemreaderjob.domain.Transaction
 import org.springframework.batch.item.ExecutionContext
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream
 import org.springframework.core.io.Resource

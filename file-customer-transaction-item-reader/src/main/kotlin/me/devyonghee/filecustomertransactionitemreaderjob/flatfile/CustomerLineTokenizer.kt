@@ -1,4 +1,4 @@
-package me.devyonghee.customertransactionitemreaderjob.flatfile
+package me.devyonghee.filecustomertransactionitemreaderjob.flatfile
 
 import org.springframework.batch.item.file.transform.DefaultFieldSetFactory
 import org.springframework.batch.item.file.transform.FieldSet
@@ -8,7 +8,7 @@ import org.springframework.batch.item.file.transform.LineTokenizer
 object CustomerLineTokenizer : LineTokenizer {
 
     private const val DEFAULT_DELIMITER: String = ","
-    private val FIELD_SET_FACTORY: FieldSetFactory = DefaultFieldSetFactory().apply {  }
+    private val FIELD_SET_FACTORY: FieldSetFactory = DefaultFieldSetFactory().apply { }
     private val NAMES: Array<String> = arrayOf(
         "firstName",
         "middleInitial",

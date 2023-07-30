@@ -1,4 +1,4 @@
-package me.devyonghee.customertransactionitemreaderjob.json
+package me.devyonghee.filecustomertransactionitemreaderjob.json
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.text.SimpleDateFormat

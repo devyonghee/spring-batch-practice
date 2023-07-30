@@ -1,4 +1,4 @@
-package me.devyonghee.customertransactionitemreaderjob.domain
+package me.devyonghee.filecustomertransactionitemreaderjob.flatfile
 
 import java.util.Date
 

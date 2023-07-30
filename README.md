@@ -430,3 +430,14 @@
 - `StaxEventItemReader`
   - 스프링 배치가 제공하는 xml 파일을 파싱하는 `ItemReader`
   - `Unmarshaller` 구현체를 전달 받아 도메인 객체로 변환
+- `JsonItemReader`
+  - 스프링 배치가 제공하는 json 파일을 파싱하는 `ItemReader`
+  - `JsonObjectReader` 을 제공받아 파싱하는데 `JacksonJsonObjectReader` 이 주요 클래스
+
+### 데이터 베이스 입력
+
+데이터베이스는 트랜잭션 기능을 제공하여 대체적으로 배치에서 성능이 우수하고 파일보다 확장성이 좋음  
+뛰어난 복구 기능 또한 기본으로 제공 
+
+- `JDBC`
+  - 

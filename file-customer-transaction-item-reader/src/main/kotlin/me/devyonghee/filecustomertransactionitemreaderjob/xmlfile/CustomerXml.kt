@@ -1,4 +1,4 @@
-package me.devyonghee.customertransactionitemreaderjob.xmlfile
+package me.devyonghee.filecustomertransactionitemreaderjob.xmlfile
 
 import jakarta.xml.bind.annotation.XmlAccessType
 import jakarta.xml.bind.annotation.XmlAccessorType

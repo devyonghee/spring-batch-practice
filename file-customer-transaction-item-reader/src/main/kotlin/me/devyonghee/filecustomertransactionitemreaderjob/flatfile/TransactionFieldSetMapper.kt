@@ -1,7 +1,5 @@
-package me.devyonghee.customertransactionitemreaderjob.flatfile
+package me.devyonghee.filecustomertransactionitemreaderjob.flatfile
 
-import me.devyonghee.customertransactionitemreaderjob.domain.CustomerLineType
-import me.devyonghee.customertransactionitemreaderjob.domain.Transaction
 import org.springframework.batch.item.file.mapping.FieldSetMapper
 import org.springframework.batch.item.file.transform.FieldSet
 

@@ -1,4 +1,4 @@
-package me.devyonghee.customertransactionitemreaderjob.domain
+package me.devyonghee.filecustomertransactionitemreaderjob.flatfile
 
 data class Customer(
     val firstName: String,
