@@ -427,3 +427,6 @@
 - `FlatFileItemReader`
   - 플랫 파일: 한 개 또는 그 이상의 레코드가 포함된 특정 파일
   - 커스텀 구분자를 사용하기 위해서는 `LineTokenizer` 사용
+- `StaxEventItemReader`
+  - 스프링 배치가 제공하는 xml 파일을 파싱하는 `ItemReader`
+  - `Unmarshaller` 구현체를 전달 받아 도메인 객체로 변환
