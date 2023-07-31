@@ -7,7 +7,7 @@ import org.springframework.boot.runApplication
 class DatabaseCustomerTransactionItemReaderJobApplication
 
 fun main(args: Array<String>) {
-    val jobArgs = arrayOf("--job.name=jsonFileJob", "customerFile=input/customer.json")
+    val jobArgs = arrayOf("--job.name=jdbcJob", "city=Chicago")
 
     runApplication<DatabaseCustomerTransactionItemReaderJobApplication>(*args, *jobArgs)
 }

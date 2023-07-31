@@ -3,10 +3,20 @@ spring:
     url: jdbc:mysql://localhost:3306/batch
     username: root
     password: password
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+  sql:
+    init:
+      platform: mysql
+      mode: always
   docker:
     compose:
       lifecycle-management: start_only
   batch:
     jdbc:
       initialize-schema: always
+
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
