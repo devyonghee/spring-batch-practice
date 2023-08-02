@@ -1,4 +1,4 @@
-package me.devyonghee.databasecustomertransactionitemreaderjob.jdbc
+package me.devyonghee.databasecustomertransactionitemreader.jdbc
 
 data class Customer(
     val id: Long,

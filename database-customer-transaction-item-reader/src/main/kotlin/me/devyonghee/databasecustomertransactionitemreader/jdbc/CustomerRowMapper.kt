@@ -1,4 +1,4 @@
-package me.devyonghee.databasecustomertransactionitemreaderjob.jdbc
+package me.devyonghee.databasecustomertransactionitemreader.jdbc
 
 import java.sql.ResultSet
 import org.springframework.jdbc.core.RowMapper

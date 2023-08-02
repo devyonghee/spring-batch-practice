@@ -451,4 +451,17 @@
     - 고유한 SQL 쿼리를 통해 생성
     - `JdbcPagingItemReader` 를 사용하면 페이징 기법을 사용할 수 있음
       - `PageingQueryProvider` 구현체 제공 필요
-    
+- 하이버네이트 (deprecated)
+  - 배치 처리에서 하이버네이트는 애플리케이션에서 사용하는 것 만큼 직관적이지 않음
+  - 하이버네이트 그대로 사용한다면 문제가 있음
+    - 일반적인 스테이트풀(stateful) 세션 구현체를 사용하기 때문에 `OutOfMemoryException` 발생 가능
+    - JDBC 를 사용하는 것보다 더 큰 부하 유발
+  - 일반적인 Datasource 커넥션과 하이버네이트 세션을 아우르는 `TransactionManager` 필요
+    - `HibernateTransactionManager` 제공
+    - `DefaultBatchConfiguration` 을 통해 설정 가능
+  - `ItemReader` 는 커밋할 때, 세션(session)을 플러시(flush) 하며 배치 처리에 대해 추가 기능 제공
+  - `HibernateCursorItemReader` 을 통해 커서 사용 가능
+  - `HibernatePagingItemReader` 을 통해 페이징 사용 가능
+- JPA (Java Persistence API)
+  - 하이버네이트와 다르게 `JpaTransactionManager` 를 구성해주기 때문에 `BatchConfiguration` 설정 필요 없음
+  - `JpaPagingItemReader` 를 통해 페이징 사용 가능

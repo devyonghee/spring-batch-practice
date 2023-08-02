@@ -1,4 +1,4 @@
-package me.devyonghee.databasecustomertransactionitemreaderjob
+package me.devyonghee.databasecustomertransactionitemreader
 
 import com.p6spy.engine.spy.P6SpyOptions
 import com.p6spy.engine.spy.appender.MessageFormattingStrategy

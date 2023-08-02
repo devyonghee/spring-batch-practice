@@ -1,4 +1,4 @@
-package me.devyonghee.databasecustomertransactionitemreaderjob.jdbc
+package me.devyonghee.databasecustomertransactionitemreader.jdbc
 
 import javax.sql.DataSource
 import org.slf4j.Logger
