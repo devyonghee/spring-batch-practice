@@ -10,18 +10,21 @@ import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
-import org.springframework.batch.item.ItemReader
 import org.springframework.batch.item.ItemWriter
+import org.springframework.batch.item.data.RepositoryItemReader
+import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder
 import org.springframework.batch.item.database.JpaCursorItemReader
 import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.data.domain.Sort
 import org.springframework.transaction.PlatformTransactionManager
 
 @Configuration
 class JpaCustomerJobConfiguration(
     private val jobRepository: JobRepository,
+    private val customerRepository: CustomerRepository,
     private val transactionManager: PlatformTransactionManager,
     private val entityManagerFactory: EntityManagerFactory,
 ) {
@@ -39,9 +42,23 @@ class JpaCustomerJobConfiguration(
     fun jpaStep(): Step {
         return StepBuilder("jpaStep", jobRepository)
             .chunk<Customer, Customer>(10, transactionManager)
-//            .reader(jpaCursorItemReader())
-            .reader(jpaCursorItemReader(""))
+            //.reader(jpaCursorItemReader(""))
+            .reader(springDataJpaItemReader(""))
             .writer(itemWriter())
+            .build()
+    }
+
+    @Bean
+    @StepScope
+    fun springDataJpaItemReader(
+        @Value("#{jobParameters['city']}") city: String,
+    ): RepositoryItemReader<Customer> {
+        return RepositoryItemReaderBuilder<Customer>()
+            .name("springDataJpaItemReader")
+            .repository(customerRepository)
+            .methodName("findByCity")
+            .arguments(listOf(city))
+            .sorts(mapOf("lastName" to Sort.Direction.ASC))
             .build()
     }
 

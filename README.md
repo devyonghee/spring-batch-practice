@@ -469,4 +469,18 @@
   - 프로시저 생성은 `schema.sql` 으로 생성하는 것이 아닌 직접 코드를 실행해야 함
   - `StoredProcedureItemReader` 를 통해 저장 프로시저 사용 가능
     - `JdbcCursorItemReader` 바탕으로 설계 (구성 코드도 유사)
-    - SQL 을 지정하는 것이 아닌 프로시저 이름을 지정
+    - SQL 을 지정하는 것이 아닌 프로시저 이름을 지정 
+- 스프링 데이터
+  - 몽고 DB
+    - NoSQL 데이터 저장소로 사용
+    - 자바스크립트 또는 JSON 기반 쿼언어로 검색 가능
+    - 기본으로 리플리케이션(replication) 지원 (가용성)
+    - 기본으로 샤딩(sharding) 지원 (확장성)
+    - 지리공간정보(Geospatial) 지원 (특정 지점 질의 가능)
+    - `MongoItemReader` 를 통해 몽고 DB 사용 가능
+  - 스프링 데이터 레포지토리
+    - 스프링 데이터가 제공하는 인터페이스 중 하나를 정의하면 구현 부분을 처리
+    - `PagingAndSortingRepository` 를 활용하기 때문에 스프링 배치와 호환성이 좋음
+
+### 기존 서비스 활용
+

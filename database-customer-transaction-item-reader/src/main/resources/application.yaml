@@ -16,7 +16,13 @@ spring:
       initialize-schema: never
     job:
       name: ${job.name:NONE}
-
+  data:
+    mongodb:
+      username: root
+      password: password
+      database: tweets
+      host: localhost
+      port: 27017
 decorator:
   datasource:
     p6spy:

@@ -5,6 +5,7 @@ plugins {
 dependencies {
     implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 
