@@ -465,3 +465,8 @@
 - JPA (Java Persistence API)
   - 하이버네이트와 다르게 `JpaTransactionManager` 를 구성해주기 때문에 `BatchConfiguration` 설정 필요 없음
   - `JpaPagingItemReader` 를 통해 페이징 사용 가능
+- 저장 프로시저
+  - 프로시저 생성은 `schema.sql` 으로 생성하는 것이 아닌 직접 코드를 실행해야 함
+  - `StoredProcedureItemReader` 를 통해 저장 프로시저 사용 가능
+    - `JdbcCursorItemReader` 바탕으로 설계 (구성 코드도 유사)
+    - SQL 을 지정하는 것이 아닌 프로시저 이름을 지정

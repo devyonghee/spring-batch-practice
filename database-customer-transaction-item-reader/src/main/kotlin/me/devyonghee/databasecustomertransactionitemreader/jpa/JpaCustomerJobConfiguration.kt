@@ -12,6 +12,7 @@ import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.batch.item.ItemReader
 import org.springframework.batch.item.ItemWriter
+import org.springframework.batch.item.database.JpaCursorItemReader
 import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -48,7 +49,7 @@ class JpaCustomerJobConfiguration(
     @StepScope
     fun jpaCursorItemReader(
         @Value("#{jobParameters['city']}") city: String,
-    ): ItemReader<Customer> {
+    ): JpaCursorItemReader<Customer> {
         return JpaCursorItemReaderBuilder<Customer>()
             .name("jpaCursorItemReader")
             .entityManagerFactory(entityManagerFactory)
@@ -68,5 +69,4 @@ class JpaCustomerJobConfiguration(
             items.forEach { log.info("write customer `{}`", it) }
         }
     }
-
 }

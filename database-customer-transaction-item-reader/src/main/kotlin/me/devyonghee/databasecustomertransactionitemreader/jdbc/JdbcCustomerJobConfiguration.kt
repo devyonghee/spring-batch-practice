@@ -12,6 +12,7 @@ import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
 import org.springframework.batch.item.ItemReader
 import org.springframework.batch.item.ItemWriter
+import org.springframework.batch.item.database.JdbcCursorItemReader
 import org.springframework.batch.item.database.PagingQueryProvider
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder
@@ -49,7 +50,7 @@ class JdbcCustomerJobConfiguration(
     }
 
     @Bean
-    fun jdbcCursorItemReader(): ItemReader<Customer> {
+    fun jdbcCursorItemReader(): JdbcCursorItemReader<Customer> {
         return JdbcCursorItemReaderBuilder<Customer>()
             .name("jdbcCursorItemReader")
             .dataSource(dataSource)

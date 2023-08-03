@@ -8,7 +8,8 @@ class DatabaseCustomerTransactionItemReaderJobApplication
 
 fun main(args: Array<String>) {
     // val jobArgs = arrayOf("--job.name=jdbcJob", "city=Chicago")
-    val jobArgs = arrayOf("--job.name=jpaJob", "city=Chicago")
+    // val jobArgs = arrayOf("--job.name=jpaJob", "city=Chicago")
+    val jobArgs = arrayOf("--job.name=storedProcedureJob", "city=Chicago")
 
     runApplication<DatabaseCustomerTransactionItemReaderJobApplication>(*args, *jobArgs)
 }

@@ -7,13 +7,13 @@ spring:
   sql:
     init:
       platform: mysql
-      mode: always
+      mode: never
   docker:
     compose:
       lifecycle-management: start_only
   batch:
     jdbc:
-      initialize-schema: always
+      initialize-schema: never
     job:
       name: ${job.name:NONE}
 

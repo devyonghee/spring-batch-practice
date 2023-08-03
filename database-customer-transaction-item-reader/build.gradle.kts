@@ -7,5 +7,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
+
     runtimeOnly("com.mysql:mysql-connector-j")
+    runtimeOnly("org.flywaydb:flyway-mysql")
 }
