@@ -484,3 +484,14 @@
 
 ### 기존 서비스 활용
 
+- 기존 애플리케이션 코드를 활용할 수 있음
+- 입력 데이터를 읽을 때는 `ItemReaderAdapter` 사용
+
+### 커스텀 입력
+
+- 커스텀 ItemReader 를 만들어야 하는 경우가 있음
+- 스프링 배치가 `JobRepository` 에 상태를 저장해서 이전에 종료된 지점부터 다시 시작하려면 `ItemStream` 구현 필요
+  - `ItemStream` 은 `open`, `update`, `close` 메서드를 제공하고, 각 스텝을 실행하는 도중에 메서드 호출
+  - `open`: 처리된 레코드의 개수를 가져오는데 사용 (`ExecutionContext` 에 접근)
+  - `update`: 스프링 배치가 잡의 상태를 갱신 처리 (`ExecutionContext` 에 접근)
+  - `close`: 리소스를 닫는 데 사용

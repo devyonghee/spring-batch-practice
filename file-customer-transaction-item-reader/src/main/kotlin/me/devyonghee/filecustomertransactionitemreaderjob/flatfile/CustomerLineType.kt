@@ -1,4 +1,0 @@
-package me.devyonghee.filecustomertransactionitemreaderjob.flatfile
-
-sealed interface CustomerLineType
-
