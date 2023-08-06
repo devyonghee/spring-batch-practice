@@ -495,3 +495,13 @@
   - `open`: 처리된 레코드의 개수를 가져오는데 사용 (`ExecutionContext` 에 접근)
   - `update`: 스프링 배치가 잡의 상태를 갱신 처리 (`ExecutionContext` 에 접근)
   - `close`: 리소스를 닫는 데 사용
+
+### 에러 처리
+
+- 레코드 건너뛰기
+  - 어떤 예외를 건너뛰게 할지, 몇 번까지 예외를 허용할지 설정 가능
+  - `SkipPolicy` 를 구현체는 건너 뛸 예외와 허용 횟수 판별 가능
+- 잘못된 레코드 로그 남기기
+  - `ItemListenerSupport` 를 통해 로그를 남길 수 있음
+- 입력이 없을 때의 처리
+  - `StepListener` 의 `AfterStep` 메서드로 적절한 처리 가능

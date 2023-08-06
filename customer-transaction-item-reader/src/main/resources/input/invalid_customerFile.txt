@@ -1,0 +1,7 @@
+Aimee1,C,Hoover,7341,Vel Avenue,Mobile,AL,35928
+Jonas1,U,Gilbert,8852,In St.,Saint Paul,MN,57321
+invalid,T,Minella,#123,4th Street#,Chicago,IL,60606,invalid
+Regan1,M,Baxter,4851,Nec Av.,Gulfport,MS,33193
+invalid,A,Minella,#123,4th Street#,Chicago,IL,60606,invalid,invalid
+Michael1,T,Minella,#123,4th Street#,Chicago,IL,60606
+Michael1,T,Minella,#123,4th Street#,Chicago,IL,60606

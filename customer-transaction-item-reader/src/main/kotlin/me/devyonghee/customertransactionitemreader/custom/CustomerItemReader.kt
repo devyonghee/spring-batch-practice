@@ -29,6 +29,7 @@ class CustomerItemReader : AbstractItemStreamItemReader<Customer>() {
         return customers.getOrNull(currentIndex++)
     }
 
+    // 중간에 에러가 발생하면 건너 뛰고 실행하도록 설정
     override fun open(executionContext: ExecutionContext) {
         if (!executionContext.containsKey(getExecutionContextKey(INDEX_KEY))) {
             currentIndex = 0

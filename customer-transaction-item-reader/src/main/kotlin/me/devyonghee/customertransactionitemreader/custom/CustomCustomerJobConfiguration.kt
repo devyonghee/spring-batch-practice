@@ -24,7 +24,6 @@ class CustomCustomerJobConfiguration(
     @Bean
     fun customJob(): Job {
         return JobBuilder("customJob", jobRepository)
-//            .incrementer(RunIdIncrementer())
             .start(customStep())
             .build()
     }

@@ -15,7 +15,9 @@ fun main(args: Array<String>) {
     // val jobArgs = arrayOf("--job.name=storedProcedureJob", "city=Chicago")
     // val jobArgs = arrayOf("--job.name=mongodbJob", "hashTag=nodejs")
     // val jobArgs = arrayOf("--job.name=serviceJob")
-    val jobArgs = arrayOf("--job.name=customJob")
+    // val jobArgs = arrayOf("--job.name=customJob")
+    //val jobArgs = arrayOf("--job.name=errorHandleJob", "customerFile=input/invalid_customerFile.txt")
+    val jobArgs = arrayOf("--job.name=errorHandleJob", "customerFile=input/empty_customerFile.txt")
 
     runApplication<CustomerTransactionItemReaderApplication>(*args, *jobArgs)
 }
