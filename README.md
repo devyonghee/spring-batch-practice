@@ -505,3 +505,33 @@
   - `ItemListenerSupport` 를 통해 로그를 남길 수 있음
 - 입력이 없을 때의 처리
   - `StepListener` 의 `AfterStep` 메서드로 적절한 처리 가능
+
+## ItemProcessor
+
+- 일반적으로 용도 중 하나로 읽은 아이템을 쓰기 처리하지 않도록 필터링
+- 아이템의 입력 타입과 반환 타입이 같을 필요가 없음
+  - 입력 아이템 객체의 타입을 쓰기 작업을 수행하기 위한 다른 타입으로 변환하여 반환 가능
+  - 반환 타입은 `ItemWriter` 에서 입력으로 사용
+- `null` 을 반환하면 해당 아이템의 이후 처리가 중지됨
+  - 해당 아이템의 `ItemProcessor` 나 `ItemWriter` 호출되지 않음 (다른 아이템은 계속 처리됨)
+- 스프링 배치는 스텝을 여러 부분으로 분리하여 고유한 작업 수행 가능
+  - 입력의 유효성 검증
+    - `ItemProcessor` 가 유효성 검증을 수행하면 입력 방법에 관계 없이 객체의 유효성 검증 가능
+  - 기존의 서비스 재사용
+    - `ItemReaderAdapter` 처럼 `ItemProcessorAdapter` 를 제공하여 서비스 재사용 가능
+  - 스크립트 실행
+    - `ScriptItemProcessor` 를 사용하면 특정 스크립트 실행 가능
+    - 스크립트에 입력으로 아이템을 제공하고 출력을 반환값으로 가져올 수 있음
+  - `ItemProcessor` 체인
+    - 동일 트랜잭션 내에서 여러 작업 수행 가능
+    - 로직 강결합을 해결할 수 있음
+
+
+### ItemProcessor 사용
+
+- `ValidatingItemProcessor`
+  - 비즈니스 규칙에 따른 유효성 검증 수행
+  - 스프링 배치 `Validator` 인터페이스 구현체 사용 가능
+  - 유효성 검증에 실패하면 `ValidationException` 발생
+  - `ItemReader` 에서는 유형과 포맷 관련된 데이터 유효성만 검증하는 것이 좋음
+  - 검증 기능을 직접 구현하고 싶다면 `ValidagingItemProcessor` 를 사용하여 `Validator` 인터페이스 구현체 주입
