@@ -535,3 +535,6 @@
   - 유효성 검증에 실패하면 `ValidationException` 발생
   - `ItemReader` 에서는 유형과 포맷 관련된 데이터 유효성만 검증하는 것이 좋음
   - 검증 기능을 직접 구현하고 싶다면 `ValidagingItemProcessor` 를 사용하여 `Validator` 인터페이스 구현체 주입
+- `ItemProcessorAdapter`
+  - 개발된 서비스를 `ItemProcessor` 의 역할을 하도록 만들 수 있음
+  - 
