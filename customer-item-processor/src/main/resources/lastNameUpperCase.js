@@ -1,0 +1,9 @@
+item.copy(
+    item.firstName,
+    item.middleInitial,
+    item.lastName.toUpperCase(),
+    item.address,
+    item.city,
+    item.state,
+    item.zipCode
+);

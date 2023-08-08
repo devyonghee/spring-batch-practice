@@ -14,6 +14,7 @@ import org.springframework.batch.item.ItemWriter
 import org.springframework.batch.item.adapter.ItemProcessorAdapter
 import org.springframework.batch.item.file.FlatFileItemReader
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder
+import org.springframework.batch.item.support.ScriptItemProcessor
 import org.springframework.batch.item.validator.BeanValidatingItemProcessor
 import org.springframework.batch.item.validator.ValidatingItemProcessor
 import org.springframework.beans.factory.annotation.Value
@@ -27,7 +28,7 @@ import org.springframework.transaction.PlatformTransactionManager
 class ValidationCustomerJobConfiguration(
     private val jobRepository: JobRepository,
     private val transactionManager: PlatformTransactionManager,
-    private val upperCaseNameService: UpperCaseNameService,
+    private val firstNameUpperCaseNameService: FirstNameUpperCaseNameService,
 ) {
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
@@ -45,7 +46,8 @@ class ValidationCustomerJobConfiguration(
             .chunk<Customer, Customer>(3, transactionManager)
             .reader(validationCustomerItemReader(PathResource("")))
             .processor(customerValidatingItemProcessor())
-            .processor(upperCaseItemProcessor())
+            .processor(firstNameUpperCaseItemProcessor())
+            .processor(lastNameUpperCaseItemProcessor(PathResource("")))
             .writer(itemWriter())
             .build()
     }
@@ -62,12 +64,21 @@ class ValidationCustomerJobConfiguration(
     }
 
     @Bean
-    fun upperCaseItemProcessor(): ItemProcessor<Customer, Customer> {
+    fun firstNameUpperCaseItemProcessor(): ItemProcessor<Customer, Customer> {
         return ItemProcessorAdapter<Customer, Customer>()
             .apply {
-                setTargetObject(upperCaseNameService)
-                setTargetMethod("upperCase")
+                setTargetObject(firstNameUpperCaseNameService)
+                setTargetMethod("firstNameUpperCase")
             }
+    }
+
+    @Bean
+    @StepScope
+    fun lastNameUpperCaseItemProcessor(
+        @Value("#{jobParameters['script']}") script: Resource,
+    ): ItemProcessor<Customer, Customer> {
+        return ScriptItemProcessor<Customer, Customer>()
+            .apply { setScript(script) }
     }
 
     @Bean

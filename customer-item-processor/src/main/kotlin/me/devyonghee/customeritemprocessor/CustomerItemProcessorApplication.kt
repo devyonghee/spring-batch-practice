@@ -7,7 +7,11 @@ import org.springframework.boot.runApplication
 class CustomerItemProcessorApplication
 
 fun main(args: Array<String>) {
-    val jobArgs = arrayOf("--job.name=validationJob", "customerFile=/input/customer.csv")
+    val jobArgs = arrayOf(
+        "--job.name=validationJob",
+        "customerFile=/input/customer.csv",
+        "script=/lastNameUpperCase.js"
+    )
 
     runApplication<CustomerItemProcessorApplication>(*args, *jobArgs)
 }

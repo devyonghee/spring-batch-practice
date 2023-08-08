@@ -537,4 +537,7 @@
   - 검증 기능을 직접 구현하고 싶다면 `ValidagingItemProcessor` 를 사용하여 `Validator` 인터페이스 구현체 주입
 - `ItemProcessorAdapter`
   - 개발된 서비스를 `ItemProcessor` 의 역할을 하도록 만들 수 있음
-  - 
+- `ScriptItemProcessor`
+  - 스크립트를 `ItemProcessor` 로 사용 가능
+  - 자바스크립트로 작성해야 함
+  - `ItemProcessor` 의 입력을 변수 아이템에 바인딩
