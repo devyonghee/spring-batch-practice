@@ -14,6 +14,8 @@ import org.springframework.batch.item.ItemWriter
 import org.springframework.batch.item.adapter.ItemProcessorAdapter
 import org.springframework.batch.item.file.FlatFileItemReader
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder
+import org.springframework.batch.item.support.ClassifierCompositeItemProcessor
+import org.springframework.batch.item.support.CompositeItemProcessor
 import org.springframework.batch.item.support.ScriptItemProcessor
 import org.springframework.batch.item.validator.BeanValidatingItemProcessor
 import org.springframework.batch.item.validator.ValidatingItemProcessor
@@ -45,9 +47,8 @@ class ValidationCustomerJobConfiguration(
         return StepBuilder("validationCopyFileStep", jobRepository)
             .chunk<Customer, Customer>(3, transactionManager)
             .reader(validationCustomerItemReader(PathResource("")))
-            .processor(customerValidatingItemProcessor())
-            .processor(firstNameUpperCaseItemProcessor())
-            .processor(lastNameUpperCaseItemProcessor(PathResource("")))
+            .processor(compositeItemProcessor())
+            //.processor(classifierCompositeItemProcessor())
             .writer(itemWriter())
             .build()
     }
@@ -59,8 +60,39 @@ class ValidationCustomerJobConfiguration(
     }
 
     @Bean
+    fun classifierCompositeItemProcessor(): ClassifierCompositeItemProcessor<Customer, Customer> {
+        return ClassifierCompositeItemProcessor<Customer, Customer>()
+            .apply {
+                setClassifier(
+                    ZipCodeClassifier(
+                        oddItemProcessor = firstNameUpperCaseItemProcessor(),
+                        evenItemProcessor = lastNameUpperCaseItemProcessor(PathResource(""))
+                    )
+                )
+            }
+    }
+
+    @Bean
+    fun compositeItemProcessor(): CompositeItemProcessor<Customer, Customer> {
+        return CompositeItemProcessor<Customer, Customer>()
+            .apply {
+                setDelegates(
+                    listOf(
+                        EventFilteringItemProcessor,
+                        customerValidatingItemProcessor(),
+                        firstNameUpperCaseItemProcessor(),
+                        lastNameUpperCaseItemProcessor(PathResource("")),
+                    )
+                )
+            }
+    }
+
+    @Bean
     fun customerValidatingItemProcessor(): ValidatingItemProcessor<Customer> {
-        return ValidatingItemProcessor<Customer>(validator())
+        return ValidatingItemProcessor(validator())
+            .apply {
+                setFilter(true)
+            }
     }
 
     @Bean

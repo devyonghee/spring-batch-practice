@@ -541,3 +541,13 @@
   - 스크립트를 `ItemProcessor` 로 사용 가능
   - 자바스크립트로 작성해야 함
   - `ItemProcessor` 의 입력을 변수 아이템에 바인딩
+- `CompositeItemProcessor`
+  - `ItemProcessor` 를 체인처럼 연결하여 순서대로 호출
+  - 복잡한 오케스트레이션 수행 가능
+  - 일부 아이템만 특정 프로세스에게 전달하고 싶다면 `ClassifierCompositeItemProcessor` 사용
+
+### ItemProcessor 만들기
+
+- 비즈니스 로직이 담기는 곳이기 때문에 직접 구현하는 경우가 많음
+- 아이템 필터링
+  - `null` 을 반환하기만 하면 아이템이 필터링 됨
