@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+  batch:
+    jdbc:
+      initialize-schema: embedded
+    job:
+      name: ${job.name:NONE}

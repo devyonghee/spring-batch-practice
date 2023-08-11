@@ -551,3 +551,20 @@
 - 비즈니스 로직이 담기는 곳이기 때문에 직접 구현하는 경우가 많음
 - 아이템 필터링
   - `null` 을 반환하기만 하면 아이템이 필터링 됨
+
+## ItemWriter
+
+- 스프링 배치의 출력을 담당하는 기능
+- `ItemReader` 와 `ItemProcessor` 에서 청크 하나가 완성되면 아이템 목록이 `ItemWriter` 에 전달
+  - 호출하는 횟수가 적어짐
+
+### 파일 기반 ItemWriter
+
+파일 기반은 백업이 쉽고 복구가 쉬운 장점이 있음
+
+- `FlatFileItemWriter`
+  - 텍스트 파일 출력을 만들 때 사용
+  - `LineAggregator` 를 통해 `ItemWriter` 가 출력할 문자열을 생성
+  - 트랜잭션이 동작하기 위해 실제 쓰기 작업을 가능한 한 늦게 수행함
+    - `TransactionSynchronizationAdapter` 의 `beforeCommit` 메서드로 구현
+    - 디스크로 플러시되면 롤백할 수 없기 때문에 상호작용을 우선 실행

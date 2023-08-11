@@ -7,5 +7,7 @@ import org.springframework.boot.runApplication
 class CustomizeJobRepositoryApplication
 
 fun main(args: Array<String>) {
+    val jobArgs = arrayOf("--job.name=validationJob")
+
     runApplication<CustomizeJobRepositoryApplication>(*args)
 }
