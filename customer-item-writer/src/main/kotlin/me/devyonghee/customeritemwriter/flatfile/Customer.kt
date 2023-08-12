@@ -1,4 +1,4 @@
-package me.devyonghee.customeritemwriter
+package me.devyonghee.customeritemwriter.flatfile
 
 data class Customer(
     val firstName: String,

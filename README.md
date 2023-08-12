@@ -564,7 +564,13 @@
 
 - `FlatFileItemWriter`
   - 텍스트 파일 출력을 만들 때 사용
+  - `shouldDeleteIfEmpty` 옵션은 스텝이 실행됐음에도 아무 아이템도 파일에 써지지 않으면 해당 파일 삭제
+  - `shouldDeleteIfExists` 스텝의 출력 파일과 이름이 같은 파일이 존재하면 삭제
+  - `append` 메서드를 통해 `appendAllowed` 옵션을 설정하면 같은 이름의 파일에 데이터 추가 (없으면 생성)
   - `LineAggregator` 를 통해 `ItemWriter` 가 출력할 문자열을 생성
   - 트랜잭션이 동작하기 위해 실제 쓰기 작업을 가능한 한 늦게 수행함
     - `TransactionSynchronizationAdapter` 의 `beforeCommit` 메서드로 구현
     - 디스크로 플러시되면 롤백할 수 없기 때문에 상호작용을 우선 실행
+- `StaxEventItemWriter`
+  - 스프링 배치가 제공하는 xml 파일로 작성하는 `ItemWriter`
+  - 리소스, 루트 앨리먼트 이름, 아이템을 XML 로 변환하는 마샬러로 구성

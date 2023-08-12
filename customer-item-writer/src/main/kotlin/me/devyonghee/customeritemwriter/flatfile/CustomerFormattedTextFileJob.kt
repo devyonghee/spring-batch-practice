@@ -1,4 +1,4 @@
-package me.devyonghee.customeritemwriter
+package me.devyonghee.customeritemwriter.flatfile
 
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
@@ -65,9 +65,8 @@ class CustomerFormattedTextFileJob(
     @Bean
     @StepScope
     fun customerFileWriter(@Value("#{jobParameters['outputFile']}") outputFile: WritableResource): FlatFileItemWriter<Customer> {
-
         return FlatFileItemWriterBuilder<Customer>()
-            .name("customerFileWriter")
+            .name("customerFlatFileWriter")
             .resource(outputFile)
             // 형식화된 텍스트 파일
             // .formatted()
@@ -78,6 +77,12 @@ class CustomerFormattedTextFileJob(
             .delimiter(";")
 
             .names("firstName", "middleInitial", "lastName", "address", "city", "state", "zipCode")
+            // 아이템이 기록되지 않은 경우 출력 파일 삭제
+            .shouldDeleteIfEmpty(true)
+            // 같은 파일의 이름이 이미 존재하는 경우 삭제하지 않고 보호
+            .shouldDeleteIfExists(false)
+            // 결과 파일이 이미 존재하면 기존 파일에 데이터 추가
+            .append(true)
             .build()
     }
 }

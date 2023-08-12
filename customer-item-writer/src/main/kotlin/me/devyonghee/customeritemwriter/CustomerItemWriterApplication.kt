@@ -7,10 +7,15 @@ import org.springframework.boot.runApplication
 class CustomerItemWriterApplication
 
 fun main(args: Array<String>) {
+    // val jobArgs: Array<String> = arrayOf(
+    //     "--job.name=formatJob",
+    //     "inputFile=/data/customer.csv",
+    //     "outputFile=file:customer-item-writer/output/formattedCustomers.txt"
+    // )
     val jobArgs: Array<String> = arrayOf(
-        "--job.name=formatJob",
+        "--job.name=xmlFormatJob",
         "inputFile=/data/customer.csv",
-        "outputFile=file:customer-item-writer/output/formattedCustomers.txt"
+        "outputFile=file:customer-item-writer/output/formattedCustomers.xml"
     )
 
     runApplication<CustomerItemWriterApplication>(*args, *jobArgs)
