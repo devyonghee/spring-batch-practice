@@ -20,7 +20,7 @@ import org.springframework.core.io.WritableResource
 import org.springframework.transaction.PlatformTransactionManager
 
 @Configuration
-class CustomerFormattedTextFileJob(
+class CustomerFormattedTextFileJobConfiguration(
     private val jobRepository: JobRepository,
     private val transactionManager: PlatformTransactionManager,
 ) {

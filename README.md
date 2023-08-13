@@ -574,3 +574,15 @@
 - `StaxEventItemWriter`
   - 스프링 배치가 제공하는 xml 파일로 작성하는 `ItemWriter`
   - 리소스, 루트 앨리먼트 이름, 아이템을 XML 로 변환하는 마샬러로 구성
+
+### 데이터베이스 기반 ItemWriter
+
+데이터베이스는 파일과 다르게 트랜잭션이 적용됨
+
+- `JdbcBatchItemWrite`
+  - `JdbcTemplate` 로 배치 SQL 실행 기능을 사용하여 한 번에 청크 하나에 대한 SQL 실행
+  - `named paramter` 가 대량 SQL 에 사용 여부에 따라 `batchUpdate` 또는 `execute` 메서드 사용
+  - 테이블에 값을 삽입 하기 위한 두 가지 방법
+    - 물음표(`?`)를 값의 플레이스 홀더로 사용
+    - 네임드 파라미터(ex. `:name`) 를 플레이스 홀더로 사용
+- 

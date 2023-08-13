@@ -19,7 +19,7 @@ import org.springframework.oxm.xstream.XStreamMarshaller
 import org.springframework.transaction.PlatformTransactionManager
 
 @Configuration
-class XmFormatJob(
+class XmlFormatJobConfiguration(
     private val jobRepository: JobRepository,
     private val customerFileReader: FlatFileItemReader<Customer>,
     private val transactionManager: PlatformTransactionManager,
