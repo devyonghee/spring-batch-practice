@@ -19,7 +19,9 @@ fun main(args: Array<String>) {
     //    "outputFile=file:customer-item-writer/output/formattedCustomers.xml"
     //)
 
-    val jobArgs: Array<String> = arrayOf("--job.name=jdbcFormatJob", "inputFile=/data/customer.csv")
+    //val jobArgs: Array<String> = arrayOf("--job.name=jdbcFormatJob", "inputFile=/data/customer.csv")
+    //val jobArgs: Array<String> = arrayOf("--job.name=jpaFormatJob", "inputFile=/data/customer.csv")
+    val jobArgs: Array<String> = arrayOf("--job.name=mongoFormatJob", "inputFile=/data/customer.csv")
 
     runApplication<CustomerItemWriterApplication>(*args, *jobArgs)
 }

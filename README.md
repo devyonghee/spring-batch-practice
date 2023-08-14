@@ -585,4 +585,13 @@
   - 테이블에 값을 삽입 하기 위한 두 가지 방법
     - 물음표(`?`)를 값의 플레이스 홀더로 사용
     - 네임드 파라미터(ex. `:name`) 를 플레이스 홀더로 사용
-- 
+- `HibernateItemWriter`
+  - 모든 아이템이 저장되거나 수정되면 `Session` 의 `flush` 를 호출하여 변경사항을 한번에 실행
+  - `BatchConfigurer` 을 구현하여 `HibernateTransactionManager` 를 사용하도록 설정 필요
+- `JpaItemWriter`
+  - 청크가 완료되면 아이템 목록이 `JpaItemWriter` 에 전달하여 아이템마다 `merge` 호출하고 `flush` 호출
+
+### 스프링 데이터 ItemWriter
+
+- 몽고 DB
+  - 몽고 DB 는 ID 로 `long` 을 사용할 수 없음

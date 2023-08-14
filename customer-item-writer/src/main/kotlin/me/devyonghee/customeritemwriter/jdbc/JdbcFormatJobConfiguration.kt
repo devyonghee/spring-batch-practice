@@ -1,4 +1,4 @@
-package me.devyonghee.customeritemwriter.database
+package me.devyonghee.customeritemwriter.jdbc
 
 import java.sql.PreparedStatement
 import javax.sql.DataSource
