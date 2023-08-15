@@ -594,4 +594,14 @@
 ### 스프링 데이터 ItemWriter
 
 - 몽고 DB
+  - `MongoItemWriter` 를 사용하여 저장 
   - 몽고 DB 는 ID 로 `long` 을 사용할 수 없음
+    - 문자열로 id 를 생성
+- 네오4j
+  - 그래프 데이터베이스
+  - `Neo4jItemWriter` 를 사용하여 저장
+  - 애너테이션으로 데이터베이스 표현으로 매핑
+  - `UUID` 를 사용하여 id 를 생성
+- 피보탈 젬파이어와 아파치 지오드
+  - 인메모리 데이터 그리드 (고성능 분산 `HashMap`)
+  - `GemfireItemWriter` 를 사용하여 저장

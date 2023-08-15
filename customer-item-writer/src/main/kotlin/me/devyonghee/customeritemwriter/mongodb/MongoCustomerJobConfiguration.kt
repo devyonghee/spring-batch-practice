@@ -71,6 +71,4 @@ class MongoCustomerJobConfiguration(
             .template(mongoTemplate)
             .build()
     }
-
-
 }
