@@ -8,6 +8,8 @@ import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
+import org.springframework.batch.item.data.RepositoryItemWriter
+import org.springframework.batch.item.data.builder.RepositoryItemWriterBuilder
 import org.springframework.batch.item.database.JpaItemWriter
 import org.springframework.batch.item.database.builder.JpaItemWriterBuilder
 import org.springframework.batch.item.file.FlatFileItemReader
@@ -22,6 +24,7 @@ import org.springframework.transaction.PlatformTransactionManager
 @Configuration
 class JpaCustomerJobConfiguration(
     private val jobRepository: JobRepository,
+    private val customerRepository: CustomerRepository,
     private val entityManagerFactory: EntityManagerFactory,
     private val transactionManager: PlatformTransactionManager,
 ) {
@@ -38,7 +41,8 @@ class JpaCustomerJobConfiguration(
         return StepBuilder("jpaFormatStep", jobRepository)
             .chunk<CustomerEntity, CustomerEntity>(10, transactionManager)
             .reader(jpaCustomerFileReader(PathResource("")))
-            .writer(jpaCustomerWriter())
+            // .writer(jpaCustomerWriter())
+            .writer(repositoryCustomerWriter())
             .build()
     }
 
@@ -61,6 +65,14 @@ class JpaCustomerJobConfiguration(
                     zipCode = it.readString("zipCode"),
                 )
             }.build()
+    }
+
+    @Bean
+    fun repositoryCustomerWriter(): RepositoryItemWriter<CustomerEntity> {
+        return RepositoryItemWriterBuilder<CustomerEntity>()
+            .repository(customerRepository)
+            .methodName("save")
+            .build()
     }
 
     @Bean

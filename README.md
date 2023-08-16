@@ -605,3 +605,16 @@
 - 피보탈 젬파이어와 아파치 지오드
   - 인메모리 데이터 그리드 (고성능 분산 `HashMap`)
   - `GemfireItemWriter` 를 사용하여 저장
+- 스프링 데이터 레포지토리
+  - 쓰기작업에는 `CrudRepository` 를 사용하여 저장
+
+### 이외의 ItemWriter
+
+- `ItemWriterAdapter`
+  - 기존 서비스를 `ItemWriter` 로 사용
+  - 호출하는 메서드는 처리중인 아이템 타입만 받아들일 수 있음
+  - 두 가지 의존성 필요
+    - `targetObject`: 호출할 메서드를 가지고 있는 스프링 빈
+    - `targetMethod`: 아이템을 처리 할 메서드 이름
+- `PropertyExtractingDeliegatingItemWriter`
+  - 아이템에서 값을 추출한 후 서비스에 파라미터로 전달
