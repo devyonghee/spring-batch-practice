@@ -59,6 +59,7 @@ class MongoCustomerJobConfiguration(
                     city = it.readString("city"),
                     state = it.readString("state"),
                     zipCode = it.readString("zipCode"),
+                    email = it.readString("email")
                 )
             }.build()
     }

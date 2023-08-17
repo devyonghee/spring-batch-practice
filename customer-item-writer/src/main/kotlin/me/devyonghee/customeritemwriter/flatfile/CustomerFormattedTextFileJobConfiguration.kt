@@ -48,7 +48,7 @@ class CustomerFormattedTextFileJobConfiguration(
             .name("customerFileReader")
             .resource(inputFile)
             .delimited()
-            .names("firstName", "middleInitial", "lastName", "address", "city", "state", "zipCode")
+            .names("firstName", "middleInitial", "lastName", "address", "city", "state", "zipCode", "email")
             .fieldSetMapper {
                 Customer(
                     firstName = it.readString("firstName"),
@@ -58,6 +58,7 @@ class CustomerFormattedTextFileJobConfiguration(
                     city = it.readString("city"),
                     state = it.readString("state"),
                     zipCode = it.readString("zipCode"),
+                    email = it.readString("email")
                 )
             }.build()
     }
@@ -76,7 +77,7 @@ class CustomerFormattedTextFileJobConfiguration(
             .delimited()
             .delimiter(";")
 
-            .names("firstName", "middleInitial", "lastName", "address", "city", "state", "zipCode")
+            .names("firstName", "middleInitial", "lastName", "address", "city", "state", "zipCode", "email")
             // 아이템이 기록되지 않은 경우 출력 파일 삭제
             .shouldDeleteIfEmpty(true)
             // 같은 파일의 이름이 이미 존재하는 경우 삭제하지 않고 보호

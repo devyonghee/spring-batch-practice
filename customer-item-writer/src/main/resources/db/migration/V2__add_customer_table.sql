@@ -7,5 +7,6 @@ CREATE TABLE customer
     address        VARCHAR(45) NOT NULL,
     city           VARCHAR(45) NOT NULL,
     state          VARCHAR(2)  NOT NULL,
-    zip_code       VARCHAR(5)  NOT NULL
+    zip_code       VARCHAR(5)  NOT NULL,
+    email          VARCHAR(20) NOT NULL
 );

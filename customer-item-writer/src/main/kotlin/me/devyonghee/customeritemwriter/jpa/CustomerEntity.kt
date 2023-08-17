@@ -16,6 +16,7 @@ class CustomerEntity(
     val city: String,
     val state: String,
     val zipCode: String,
+    val email: String,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,

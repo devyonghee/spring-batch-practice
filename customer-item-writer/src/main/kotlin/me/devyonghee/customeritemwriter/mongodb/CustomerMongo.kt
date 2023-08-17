@@ -14,6 +14,7 @@ data class CustomerMongo(
     val city: String,
     val state: String,
     val zipCode: String,
+    val email: String,
 ) : Serializable {
 
     companion object {

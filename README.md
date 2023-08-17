@@ -618,3 +618,12 @@
     - `targetMethod`: 아이템을 처리 할 메서드 이름
 - `PropertyExtractingDeliegatingItemWriter`
   - 아이템에서 값을 추출한 후 서비스에 파라미터로 전달
+- `JmsItemWriter`
+  - JMS(Java Messaging Service): 메시지 지향 방식
+    - ex) 아파치의 액티브MQ
+  - JMS 큐에 메시지를 넣어 다른 시스템이 메시지를 가져가도록 함
+  - `JmsTemplate` 을 구성하여 메시지 전송
+- `SimpleMailMessageItemWriter`
+  - 잡에서 메일을 보내는 기능 제공
+  - `SimpleMailMessage` 를 확장한 객체의 목록을 제공
+  - 구글 2단계 인증이 필요한 경우 [구글 계정](https://myaccount.google.com/) 에서 앱 비밀번호 설정 필요

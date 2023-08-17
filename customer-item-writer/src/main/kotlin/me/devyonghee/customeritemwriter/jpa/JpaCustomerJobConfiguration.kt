@@ -53,7 +53,7 @@ class JpaCustomerJobConfiguration(
             .name("jpaCustomerFileReader")
             .resource(inputFile)
             .delimited()
-            .names("firstName", "middleInitial", "lastName", "address", "city", "state", "zipCode")
+            .names("firstName", "middleInitial", "lastName", "address", "city", "state", "zipCode", "email")
             .fieldSetMapper {
                 CustomerEntity(
                     firstName = it.readString("firstName"),
@@ -63,6 +63,7 @@ class JpaCustomerJobConfiguration(
                     city = it.readString("city"),
                     state = it.readString("state"),
                     zipCode = it.readString("zipCode"),
+                    email = it.readString("email")
                 )
             }.build()
     }
