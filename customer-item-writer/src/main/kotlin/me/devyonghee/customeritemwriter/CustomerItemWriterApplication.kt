@@ -23,7 +23,8 @@ fun main(args: Array<String>) {
     //val jobArgs: Array<String> = arrayOf("--job.name=jpaFormatJob", "inputFile=/data/customer.csv")
     //val jobArgs: Array<String> = arrayOf("--job.name=mongoFormatJob", "inputFile=/data/customer.csv")
     //val jobArgs: Array<String> = arrayOf("--job.name=itemWriterAdapterFormatJob", "inputFile=/data/customer.csv")
-    val jobArgs: Array<String> = arrayOf("--job.name=emailCustomerJob", "inputFile=/data/customer.csv")
+    //val jobArgs: Array<String> = arrayOf("--job.name=emailCustomerJob", "inputFile=/data/customer.csv")
+    val jobArgs: Array<String> = arrayOf("--job.name=multiXmlGeneratorJob", "inputFile=/data/customer.csv")
 
     runApplication<CustomerItemWriterApplication>(*args, *jobArgs)
 }

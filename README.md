@@ -627,3 +627,10 @@
   - 잡에서 메일을 보내는 기능 제공
   - `SimpleMailMessage` 를 확장한 객체의 목록을 제공
   - 구글 2단계 인증이 필요한 경우 [구글 계정](https://myaccount.google.com/) 에서 앱 비밀번호 설정 필요
+
+### 여러 자원을 사용하는 ItemWriter
+
+- `MultiResourceItemWriter`
+  - 다중 리소스를 생성하는 `ItemWriter`
+  - 쓰기 작업을 수행하는데 청크 개수만큼 아이템 개수를 도달해야 리소스 생성
+  - 
