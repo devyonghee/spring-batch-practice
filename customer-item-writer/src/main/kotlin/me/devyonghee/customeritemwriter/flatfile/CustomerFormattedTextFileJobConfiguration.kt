@@ -23,6 +23,7 @@ import org.springframework.transaction.PlatformTransactionManager
 class CustomerFormattedTextFileJobConfiguration(
     private val jobRepository: JobRepository,
     private val transactionManager: PlatformTransactionManager,
+    private val customerRecordCountFooterCallback: CustomerRecordCountFooterCallback,
 ) {
     @Bean
     fun formatJob(): Job {
@@ -84,6 +85,7 @@ class CustomerFormattedTextFileJobConfiguration(
             .shouldDeleteIfExists(false)
             // 결과 파일이 이미 존재하면 기존 파일에 데이터 추가
             .append(true)
+            .footerCallback(customerRecordCountFooterCallback)
             .build()
     }
 }

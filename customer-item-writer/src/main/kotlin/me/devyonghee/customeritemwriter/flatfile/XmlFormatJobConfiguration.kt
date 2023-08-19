@@ -23,6 +23,7 @@ class XmlFormatJobConfiguration(
     private val jobRepository: JobRepository,
     private val customerFileReader: FlatFileItemReader<Customer>,
     private val transactionManager: PlatformTransactionManager,
+    private val headerCallback: CustomerXmlHeaderCallback,
 ) {
     @Bean
     fun xmlFormatJob(): Job {
@@ -51,6 +52,7 @@ class XmlFormatJobConfiguration(
                 setAliases(mapOf("customer" to Customer::class.java))
                 afterPropertiesSet()
             }).rootTagName("customers")
+            .headerCallback(headerCallback)
             .build()
     }
 }

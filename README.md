@@ -573,7 +573,7 @@
     - 디스크로 플러시되면 롤백할 수 없기 때문에 상호작용을 우선 실행
 - `StaxEventItemWriter`
   - 스프링 배치가 제공하는 xml 파일로 작성하는 `ItemWriter`
-  - 리소스, 루트 앨리먼트 이름, 아이템을 XML 로 변환하는 마샬러로 구성
+  - 리소스, 루트 앨리먼트 이름, 아이템을 XML 로 변환하는 마샬러로 구성 
 
 ### 데이터베이스 기반 ItemWriter
 
@@ -633,4 +633,18 @@
 - `MultiResourceItemWriter`
   - 다중 리소스를 생성하는 `ItemWriter`
   - 쓰기 작업을 수행하는데 청크 개수만큼 아이템 개수를 도달해야 리소스 생성
-  - 
+- `CompositeItemWriter`
+  - 여러 `ItemWrtier` 가 동일한 아이템에 대해 수행할 수 있도록 기능 제공
+
+#### 헤더와 푸터
+
+파일 내에 헤더나 푸터 생성 가능  
+- 헤더: 플랫 파일의 형식(필드 또는 순서) 정의
+- 푸터: 처리된 레코드 수나 파일이 처리된 무결성 검사에 사용할 총계
+
+- `StaxWriterCallback`
+  - XML 문서에 헤더나 푸터에 구성된 콜백 실행
+- `FlatFileHeaderCallback`, `FlatFileFooterCallback`
+  - 플랫 파일에 헤더나 푸터를 추가하는 콜백
+
+

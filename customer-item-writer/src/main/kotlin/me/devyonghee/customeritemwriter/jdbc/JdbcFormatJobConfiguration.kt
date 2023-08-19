@@ -57,8 +57,9 @@ class JdbcFormatJobConfiguration(
             //        address,
             //        city,
             //        state,
-            //        zip_code)
-            //    VALUES (?, ?, ?, ?, ?, ?, ?)""".trimIndent()
+            //        zip_code,
+            //        email)
+            //    VALUES (?, ?, ?, ?, ?, ?, ?, ?)""".trimIndent()
             //).itemPreparedStatementSetter(CustomerItemPreparedStatementSetter)
 
             // 네임드 파라미터를 플레이스 홀더로 사용
@@ -71,7 +72,8 @@ class JdbcFormatJobConfiguration(
                     address,
                     city,
                     state,
-                    zip_code)
+                    zip_code,
+                    email)
                 VALUES (
                     :firstName,
                     :middleInitial,
@@ -79,7 +81,8 @@ class JdbcFormatJobConfiguration(
                     :address,
                     :city,
                     :state,
-                    :zipCode
+                    :zipCode,
+                    :email
                 )""".trimIndent()
             ).beanMapped()
 
@@ -95,6 +98,7 @@ class JdbcFormatJobConfiguration(
             ps.setString(5, item.city)
             ps.setString(6, item.state)
             ps.setString(7, item.zipCode)
+            ps.setString(8, item.email)
         }
     }
 }
