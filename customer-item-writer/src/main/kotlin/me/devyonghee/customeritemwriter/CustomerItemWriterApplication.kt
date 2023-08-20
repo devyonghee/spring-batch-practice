@@ -26,8 +26,14 @@ fun main(args: Array<String>) {
     //val jobArgs: Array<String> = arrayOf("--job.name=emailCustomerJob", "inputFile=/data/customer.csv")
     //val jobArgs: Array<String> = arrayOf("--job.name=multiXmlGeneratorJob", "inputFile=/data/customer.csv")
 
+    //val jobArgs: Array<String> = arrayOf(
+    //    "--job.name=compositeCustomerJob",
+    //    "inputFile=/data/customer.csv",
+    //    "outputFile=file:customer-item-writer/output/formattedCustomers.xml"
+    //)
+
     val jobArgs: Array<String> = arrayOf(
-        "--job.name=compositeCustomerJob",
+        "--job.name=classifierCustomerJob",
         "inputFile=/data/customer.csv",
         "outputFile=file:customer-item-writer/output/formattedCustomers.xml"
     )

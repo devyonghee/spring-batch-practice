@@ -1,5 +1,6 @@
-package me.devyonghee.customeritemwriter.flatfile
+package me.devyonghee.customeritemwriter
 
+import me.devyonghee.customeritemwriter.flatfile.Customer
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.job.builder.JobBuilder

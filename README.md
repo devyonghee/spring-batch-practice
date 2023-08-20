@@ -627,14 +627,16 @@
   - 잡에서 메일을 보내는 기능 제공
   - `SimpleMailMessage` 를 확장한 객체의 목록을 제공
   - 구글 2단계 인증이 필요한 경우 [구글 계정](https://myaccount.google.com/) 에서 앱 비밀번호 설정 필요
-
-### 여러 자원을 사용하는 ItemWriter
-
 - `MultiResourceItemWriter`
   - 다중 리소스를 생성하는 `ItemWriter`
   - 쓰기 작업을 수행하는데 청크 개수만큼 아이템 개수를 도달해야 리소스 생성
 - `CompositeItemWriter`
   - 여러 `ItemWrtier` 가 동일한 아이템에 대해 수행할 수 있도록 기능 제공
+- `ClassifierCompositeItemWriter`
+  - 다른 유형의 아이템을 확인하여 `ItemWriter` 지정
+  - `ItemStream` 의 메서드를 구현하지 않기 때문에 파일을 열고 닫는 작업을 수행하지 않아 오류 발생됨
+    - 상태를 유지하기 위해 `stream` 에 `ItemReader` 나 `ItemWriter` 등록 필요 
+
 
 #### 헤더와 푸터
 
@@ -647,4 +649,4 @@
 - `FlatFileHeaderCallback`, `FlatFileFooterCallback`
   - 플랫 파일에 헤더나 푸터를 추가하는 콜백
 
-
+  
