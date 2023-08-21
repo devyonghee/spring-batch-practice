@@ -18,10 +18,14 @@ import org.springframework.batch.item.file.transform.PatternMatchingCompositeLin
 import org.springframework.batch.item.support.ClassifierCompositeItemWriter
 import org.springframework.batch.item.support.builder.ClassifierCompositeItemWriterBuilder
 import org.springframework.batch.item.validator.ValidatingItemProcessor
+import org.springframework.batch.item.xml.StaxEventItemReader
+import org.springframework.batch.item.xml.builder.StaxEventItemReaderBuilder
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.io.PathResource
 import org.springframework.core.io.Resource
+import org.springframework.oxm.jaxb.Jaxb2Marshaller
 import org.springframework.transaction.PlatformTransactionManager
 
 @Configuration
@@ -34,6 +38,7 @@ class ImportJobConfiguration(
     fun importJob(): Job {
         return JobBuilder("importJob", jobRepository)
             .start(importCustomerUpdates())
+            .next(importTransactions())
             .build()
     }
 
@@ -41,8 +46,8 @@ class ImportJobConfiguration(
     fun importCustomerUpdates(): Step {
         return StepBuilder("importCustomerUpdates", jobRepository)
             .chunk<CustomerUpdate, CustomerUpdate>(100, transactionManager)
-            .reader()
-            .processor()
+            .reader(customerUpdateItemReader(PathResource("")))
+            .processor(customerValidatingItemProcessor())
             .writer(customerUpdateItemWriter())
             .build()
     }
@@ -192,6 +197,53 @@ class ImportJobConfiguration(
                 WHERE customer_id = :customerId
             """.trimIndent()
             ).dataSource(dataSource)
+            .build()
+    }
+
+    @Bean
+    fun importTransactions(): Step {
+        return StepBuilder("importTransactions", jobRepository)
+            .chunk<Transaction, Transaction>(100, transactionManager)
+            .reader(transactionItemReader(PathResource("")))
+            .writer(transactionItemWriter())
+            .build()
+    }
+
+    @Bean
+    @StepScope
+    fun transactionItemReader(@Value("#{jobParameters['transactionFile']}") transactionFile: Resource): StaxEventItemReader<Transaction> {
+        return StaxEventItemReaderBuilder<Transaction>()
+            .name("fooReader")
+            .resource(transactionFile)
+            .addFragmentRootElements("transaction")
+            .unmarshaller(Jaxb2Marshaller().apply {
+                setClassesToBeBound(Transaction::class.java)
+            }).build()
+    }
+
+    @Bean
+    fun transactionItemWriter(): JdbcBatchItemWriter<Transaction> {
+        return JdbcBatchItemWriterBuilder<Transaction>()
+            .dataSource(dataSource)
+            .sql(
+                """
+                INSERT INTO TRANSACTION (
+                    transaction_id,
+                    account_id,
+                    description,
+                    credit,
+                    debit,
+                    timestamp
+                ) VALUES (
+                    :transactionId,
+                    :accountId,
+                    :description,
+                    :credit,
+                    :debit,
+                    :timestamp
+                )
+            """.trimIndent()
+            ).beanMapped()
             .build()
     }
 }

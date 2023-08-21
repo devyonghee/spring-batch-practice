@@ -8,5 +8,10 @@ class ApressBankingApplication
 
 
 fun main(args: Array<String>) {
-    runApplication<ApressBankingApplication>(*args)
+    val jobArgs: Array<String> = arrayOf(
+        "customerUpdateFile=/input/customer_update.csv",
+        "transactionFile=/input/transactions.xml",
+    )
+
+    runApplication<ApressBankingApplication>(*jobArgs, *args)
 }
