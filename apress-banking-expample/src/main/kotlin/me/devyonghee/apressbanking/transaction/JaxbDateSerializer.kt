@@ -1,4 +1,4 @@
-package me.devyonghee.apressbanking.job
+package me.devyonghee.apressbanking.transaction
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter
 import java.text.SimpleDateFormat

@@ -1,4 +1,4 @@
-package me.devyonghee.apressbanking.job
+package me.devyonghee.apressbanking.customer
 
 import org.springframework.batch.item.validator.ValidationException
 import org.springframework.batch.item.validator.Validator

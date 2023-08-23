@@ -1,4 +1,4 @@
-package me.devyonghee.apressbanking.job
+package me.devyonghee.apressbanking.customer
 
 class CustomerAddressUpdate(
     override val customerId: Long,
