@@ -1,8 +1,8 @@
 package me.devyonghee.apressbanking.transaction
 
-import jakarta.xml.bind.annotation.adapters.XmlAdapter
 import java.text.SimpleDateFormat
 import java.util.Date
+import javax.xml.bind.annotation.adapters.XmlAdapter
 
 object JaxbDateSerializer : XmlAdapter<String, Date>() {
 
@@ -15,6 +15,5 @@ object JaxbDateSerializer : XmlAdapter<String, Date>() {
     override fun marshal(v: Date?): String {
         return DATE_FORMAT.format(v)
     }
-
 }
 

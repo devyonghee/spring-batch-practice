@@ -15,14 +15,18 @@ class AccountItemProcessor(
         val accounts: List<Account> = jdbcTemplate.query(
             """
                 SELECT
-                    customer_id,
-                    account_number,
-                    account_type,
-                    balance
-                FROM ACCOUNT a
+                    a.account_id,
+                    a.balance,
+                    a.last_statement_date,
+                    t.transaction_id,
+                    t.description,
+                    t.credit,
+                    t.debit,
+                    t.timestamp 
+                FROM account a
                     LEFT JOIN transaction t on a.account_id = t.account_id
                 WHERE a.account_id in 
-                    (select account_id from customer_account where customer_customer_id = ?)
+                    (select account_id from customer_account where customer_id = ?)
                 ORDER BY t.timestamp
             """.trimIndent(),
             ArgumentTypePreparedStatementSetter(arrayOf(item.customer.id), intArrayOf(Types.BIGINT)),

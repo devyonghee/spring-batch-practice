@@ -1,15 +1,20 @@
 package me.devyonghee.apressbanking
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import java.text.SimpleDateFormat
 import javax.sql.DataSource
 import me.devyonghee.apressbanking.customer.Customer
 import me.devyonghee.apressbanking.customer.CustomerAddressUpdate
 import me.devyonghee.apressbanking.customer.CustomerContactUpdate
+import me.devyonghee.apressbanking.customer.CustomerItemValidator
 import me.devyonghee.apressbanking.customer.CustomerNameUpdate
 import me.devyonghee.apressbanking.customer.CustomerUpdate
 import me.devyonghee.apressbanking.customer.CustomerUpdateClassifier
 import me.devyonghee.apressbanking.statement.AccountItemProcessor
 import me.devyonghee.apressbanking.statement.Statement
-import me.devyonghee.apressbanking.transaction.Transaction
+import me.devyonghee.apressbanking.statement.StatementHeaderCallback
+import me.devyonghee.apressbanking.statement.StatementLineAggregator
+import me.devyonghee.apressbanking.transaction.TransactionJson
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.StepScope
@@ -21,11 +26,18 @@ import org.springframework.batch.item.database.JdbcCursorItemReader
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemReader
+import org.springframework.batch.item.file.FlatFileItemWriter
+import org.springframework.batch.item.file.MultiResourceItemWriter
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder
+import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder
+import org.springframework.batch.item.file.builder.MultiResourceItemWriterBuilder
 import org.springframework.batch.item.file.mapping.FieldSetMapper
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer
 import org.springframework.batch.item.file.transform.LineTokenizer
 import org.springframework.batch.item.file.transform.PatternMatchingCompositeLineTokenizer
+import org.springframework.batch.item.json.JacksonJsonObjectReader
+import org.springframework.batch.item.json.JsonItemReader
+import org.springframework.batch.item.json.builder.JsonItemReaderBuilder
 import org.springframework.batch.item.support.ClassifierCompositeItemWriter
 import org.springframework.batch.item.support.builder.ClassifierCompositeItemWriterBuilder
 import org.springframework.batch.item.validator.ValidatingItemProcessor
@@ -36,6 +48,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.PathResource
 import org.springframework.core.io.Resource
+import org.springframework.oxm.Unmarshaller
 import org.springframework.oxm.jaxb.Jaxb2Marshaller
 import org.springframework.transaction.PlatformTransactionManager
 
@@ -43,6 +56,7 @@ import org.springframework.transaction.PlatformTransactionManager
 class ImportJobConfiguration(
     private val dataSource: DataSource,
     private val jobRepository: JobRepository,
+    private val customerItemValidator: CustomerItemValidator,
     private val accountItemProcessor: AccountItemProcessor,
     private val transactionManager: PlatformTransactionManager,
 ) {
@@ -52,7 +66,7 @@ class ImportJobConfiguration(
             .start(importCustomerUpdates())
             .next(importTransactions())
             .next(applyTransactions())
-            .next()
+            .next(generateStatements())
             .build()
     }
 
@@ -158,6 +172,7 @@ class ImportJobConfiguration(
     @Bean
     fun customerValidatingItemProcessor(): ValidatingItemProcessor<CustomerUpdate> {
         return ValidatingItemProcessor<CustomerUpdate>().apply {
+            setValidator(customerItemValidator)
             setFilter(true)
         }
     }
@@ -168,7 +183,7 @@ class ImportJobConfiguration(
             .beanMapped()
             .sql(
                 """
-                UPDATE CUSTOMER SET
+                UPDATE customer SET
                     first_name = COALESCE(:firstName, first_name),
                     middle_name = COALESCE(:middleName, middle_name),
                     last_name = COALESCE(:lastName, last_name)
@@ -184,12 +199,12 @@ class ImportJobConfiguration(
             .beanMapped()
             .sql(
                 """
-                UPDATE CUSTOMER SET
+                UPDATE customer SET
                     address1 = COALESCE(:address1, address1),
                     address2 = COALESCE(:address2, address2),
                     city = COALESCE(:city, city),
                     state = COALESCE(:state, state),
-                    postal_code = COALESCE(:postalCode, postal_code),
+                    postal_code = COALESCE(:postalCode, postal_code)
                 WHERE customer_id = :customerId
             """.trimIndent()
             ).dataSource(dataSource)
@@ -202,12 +217,12 @@ class ImportJobConfiguration(
             .beanMapped()
             .sql(
                 """
-                UPDATE CUSTOMER SET
+                UPDATE customer SET
                     email_address = COALESCE(:emailAddress, email_address),
                     home_phone = COALESCE(:homePhone, home_phone),
                     cell_phone = COALESCE(:cellPhone, cell_phone),
                     work_phone = COALESCE(:workPhone, work_phone),
-                    notification_preference = COALESCE(:notificationPreference, notification_preference),
+                    notification_preference = COALESCE(:notificationPreference, notification_preference)
                 WHERE customer_id = :customerId
             """.trimIndent()
             ).dataSource(dataSource)
@@ -217,31 +232,55 @@ class ImportJobConfiguration(
     @Bean
     fun importTransactions(): Step {
         return StepBuilder("importTransactions", jobRepository)
-            .chunk<Transaction, Transaction>(100, transactionManager)
-            .reader(transactionItemReader(PathResource("")))
+            .chunk<TransactionJson, TransactionJson>(100, transactionManager)
+            .reader(transactionJsonItemReader(PathResource("")))
             .writer(transactionItemWriter())
             .build()
     }
 
     @Bean
     @StepScope
-    fun transactionItemReader(@Value("#{jobParameters['transactionFile']}") transactionFile: Resource): StaxEventItemReader<Transaction> {
-        return StaxEventItemReaderBuilder<Transaction>()
-            .name("fooReader")
+    fun transactionJsonItemReader(
+        @Value("#{jobParameters['transactionFile']}") transactionFile: Resource,
+    ): JsonItemReader<TransactionJson> {
+        return JsonItemReaderBuilder<TransactionJson>()
+            .name("transactionJsonItemReader")
+            .resource(transactionFile)
+            .jsonObjectReader(
+                JacksonJsonObjectReader(TransactionJson::class.java)
+                    .apply {
+                        setMapper(ObjectMapper().apply {
+                            setDateFormat(SimpleDateFormat("yyyy-MM-dd hh:mm:ss"))
+                        })
+                    }).build()
+    }
+
+
+    @Bean
+    @StepScope
+    fun transactionXmlItemReader(@Value("#{jobParameters['transactionFile']}") transactionFile: Resource): StaxEventItemReader<TransactionJson> {
+        return StaxEventItemReaderBuilder<TransactionJson>()
+            .name("transactionXmlItemReader")
             .resource(transactionFile)
             .addFragmentRootElements("transaction")
-            .unmarshaller(Jaxb2Marshaller().apply {
-                setClassesToBeBound(Transaction::class.java)
-            }).build()
+            .unmarshaller(transactionUnmarshaller())
+            .build()
     }
 
     @Bean
-    fun transactionItemWriter(): JdbcBatchItemWriter<Transaction> {
-        return JdbcBatchItemWriterBuilder<Transaction>()
+    fun transactionUnmarshaller(): Unmarshaller {
+        return Jaxb2Marshaller().apply {
+            setClassesToBeBound(TransactionJson::class.java)
+        }
+    }
+
+    @Bean
+    fun transactionItemWriter(): JdbcBatchItemWriter<TransactionJson> {
+        return JdbcBatchItemWriterBuilder<TransactionJson>()
             .dataSource(dataSource)
             .sql(
                 """
-                INSERT INTO TRANSACTION (
+                INSERT INTO transaction (
                     transaction_id,
                     account_id,
                     description,
@@ -263,30 +302,32 @@ class ImportJobConfiguration(
 
     @Bean
     fun applyTransactions(): Step {
-        return StepBuilder("applyTransactions", jobRepository)
-            .chunk<Transaction, Transaction>(100, transactionManager)
-            .reader(applyTransactionReader())
+        return StepBuilder("applyTransactionJsons", jobRepository)
+            .chunk<TransactionJson, TransactionJson>(100, transactionManager)
+            .reader(applyTransactionJsonReader())
             .writer(applyTransactionWriter())
             .build()
     }
 
     @Bean
-    fun applyTransactionReader(): JdbcCursorItemReader<Transaction> {
-        return JdbcCursorItemReader<Transaction>().apply {
-            dataSource = dataSource
-            sql = """
-                        SELECT
-                            transaction_id,
-                            account_id,
-                            description,
-                            credit,
-                            debit,
-                            timestamp
-                        FROM transaction
-                        ORDER BY timestamp
+    fun applyTransactionJsonReader(): JdbcCursorItemReader<TransactionJson> {
+        return JdbcCursorItemReaderBuilder<TransactionJson>()
+            .name("applyTransactionJsonReader")
+            .dataSource(dataSource)
+            .sql(
+                """
+                    SELECT
+                        transaction_id,
+                        account_id,
+                        description,
+                        credit,
+                        debit,
+                        timestamp
+                    FROM transaction
+                    ORDER BY timestamp
                     """.trimIndent()
-            setRowMapper { rs, _ ->
-                Transaction(
+            ).rowMapper { rs, _ ->
+                TransactionJson(
                     transactionId = rs.getLong("transaction_id"),
                     accountId = rs.getLong("account_id"),
                     description = rs.getString("description"),
@@ -294,17 +335,16 @@ class ImportJobConfiguration(
                     debit = rs.getBigDecimal("debit"),
                     timestamp = rs.getTimestamp("timestamp"),
                 )
-            }
-        }
+            }.build()
     }
 
     @Bean
-    fun applyTransactionWriter(): JdbcBatchItemWriter<Transaction> {
-        return JdbcBatchItemWriterBuilder<Transaction>()
+    fun applyTransactionWriter(): JdbcBatchItemWriter<TransactionJson> {
+        return JdbcBatchItemWriterBuilder<TransactionJson>()
             .dataSource(dataSource)
             .sql(
                 """
-                UPDATE ACCOUNT 
+                UPDATE account 
                     SET balance = balance + :transactionAmount
                 WHERE account_id = :accountId
             """.trimIndent()
@@ -318,7 +358,7 @@ class ImportJobConfiguration(
             .chunk<Statement, Statement>(1, transactionManager)
             .reader(statementItemReader())
             .processor(accountItemProcessor)
-            .writer()
+            .writer(statementItemWriter(PathResource("")))
             .build()
     }
 
@@ -327,27 +367,47 @@ class ImportJobConfiguration(
         return JdbcCursorItemReaderBuilder<Statement>()
             .name("statementItemReader")
             .dataSource(dataSource)
-            .sql("SELECT * FROM CUSTOMER")
+            .sql("SELECT * FROM customer")
             .rowMapper { rs, _ ->
                 Statement(
                     Customer(
                         rs.getLong("customer_id"),
                         rs.getString("first_name"),
-                        rs.getString("middleName"),
-                        rs.getString("lastName"),
+                        rs.getString("middle_name"),
+                        rs.getString("last_name"),
                         rs.getString("address1"),
-                        rs.getString("address2"),
+                        rs.getString("address2").takeIf { !rs.wasNull() },
                         rs.getString("city"),
                         rs.getString("state"),
-                        rs.getString("postalCode"),
+                        rs.getString("postal_code"),
                         rs.getString("ssn"),
-                        rs.getString("emailAddress"),
-                        rs.getString("homePhone"),
-                        rs.getString("cellPhone"),
-                        rs.getString("workPhone"),
-                        rs.getInt("notificationPreference"),
+                        rs.getString("email_address").takeIf { !rs.wasNull() },
+                        rs.getString("home_phone").takeIf { !rs.wasNull() },
+                        rs.getString("cell_phone").takeIf { !rs.wasNull() },
+                        rs.getString("work_phone").takeIf { !rs.wasNull() },
+                        rs.getInt("notification_preference"),
                     )
                 )
             }.build()
+    }
+
+    @Bean
+    @StepScope
+    fun statementItemWriter(@Value("#{jobParameters['outputDirectory']}") outputDirectory: Resource): MultiResourceItemWriter<Statement> {
+        return MultiResourceItemWriterBuilder<Statement>()
+            .name("statementItemWriter")
+            .resource(outputDirectory)
+            .itemCountLimitPerResource(1)
+            .delegate(individualStatementItemWriter())
+            .build()
+    }
+
+    @Bean
+    fun individualStatementItemWriter(): FlatFileItemWriter<Statement> {
+        return FlatFileItemWriterBuilder<Statement>()
+            .name("individualStatementItemWriter")
+            .headerCallback(StatementHeaderCallback)
+            .lineAggregator(StatementLineAggregator)
+            .build()
     }
 }

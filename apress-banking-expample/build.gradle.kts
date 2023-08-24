@@ -8,5 +8,8 @@ dependencies {
     implementation("javax.xml.bind:jaxb-api:2.3.0")
     implementation("org.glassfish.jaxb:jaxb-runtime")
 
+    implementation("com.fasterxml.jackson.core:jackson-databind")
+
     runtimeOnly("com.mysql:mysql-connector-j")
+    runtimeOnly("org.flywaydb:flyway-mysql")
 }

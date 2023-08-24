@@ -3,6 +3,7 @@ package me.devyonghee.apressbanking.statement
 import java.util.Date
 import me.devyonghee.apressbanking.customer.Customer
 import me.devyonghee.apressbanking.transaction.Transaction
+import me.devyonghee.apressbanking.transaction.TransactionJson
 import org.springframework.batch.item.file.transform.LineAggregator
 
 object StatementLineAggregator : LineAggregator<Statement> {
@@ -22,7 +23,7 @@ object StatementLineAggregator : LineAggregator<Statement> {
 
     private fun formatAccount(statement: Statement) =
         statement.accounts.joinToString("\n") { account ->
-            val transactions: List<Transaction> = account.transactions
+            val transactions: List<TransactionJson> = account.transactions
 
             """
                 ${STATEMENT_DATE_LINE.format(account.lastStatementDate, Date())}

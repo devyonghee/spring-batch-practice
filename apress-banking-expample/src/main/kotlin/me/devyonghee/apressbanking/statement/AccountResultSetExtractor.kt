@@ -1,7 +1,7 @@
 package me.devyonghee.apressbanking.statement
 
 import java.sql.ResultSet
-import me.devyonghee.apressbanking.transaction.Transaction
+import me.devyonghee.apressbanking.transaction.TransactionJson
 import org.springframework.jdbc.core.ResultSetExtractor
 
 class AccountResultSetExtractor : ResultSetExtractor<List<Account>> {
@@ -15,18 +15,18 @@ class AccountResultSetExtractor : ResultSetExtractor<List<Account>> {
                 curAccount = Account(
                     id = rs.getLong("account_id"),
                     balance = rs.getBigDecimal("balance"),
-                    lastStatementDate = rs.getDate("timestamp"),
+                    lastStatementDate = rs.getDate("last_statement_date"),
                 )
             }
 
             if (!rs.getString("description").isNullOrBlank()) {
                 curAccount = curAccount?.addedTransaction(
-                    Transaction(
+                    TransactionJson(
                         transactionId = rs.getLong("transaction_id"),
                         accountId = rs.getLong("account_id"),
                         description = rs.getString("description"),
-                        credit = rs.getBigDecimal("credit"),
-                        debit = rs.getBigDecimal("debit"),
+                        credit = rs.getBigDecimal("credit").takeIf { !rs.wasNull() },
+                        debit = rs.getBigDecimal("debit").takeIf { !rs.wasNull() },
                         timestamp = rs.getDate("timestamp"),
                     )
                 )

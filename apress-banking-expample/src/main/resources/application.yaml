@@ -9,10 +9,7 @@ spring:
       lifecycle-management: start_only
   batch:
     jdbc:
-      initialize-schema: always
-  sql:
-    init:
-      mode: always
+      initialize-schema: never
 decorator:
   datasource:
     p6spy:

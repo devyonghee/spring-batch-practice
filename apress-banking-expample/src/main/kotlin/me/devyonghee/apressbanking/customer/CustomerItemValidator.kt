@@ -21,7 +21,7 @@ class CustomerItemValidator(
 
     companion object {
         private const val FIND_CUSTOMER = """
-            SELECT COUNT(*) FROM CUSTOMER WHERE customer_id = :id
+            SELECT COUNT(*) FROM customer WHERE customer_id = :id
         """
     }
 }
