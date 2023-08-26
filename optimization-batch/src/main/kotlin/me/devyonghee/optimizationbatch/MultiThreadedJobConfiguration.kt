@@ -1,7 +1,5 @@
 package me.devyonghee.optimizationbatch
 
-import java.math.BigDecimal
-import java.util.Date
 import javax.sql.DataSource
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
@@ -84,11 +82,4 @@ class MultiThreadedJobConfiguration(
             ).beanMapped()
             .build()
     }
-
-
-    data class Transaction(
-        val account: String,
-        val amount: BigDecimal,
-        val timestamp: Date,
-    )
 }

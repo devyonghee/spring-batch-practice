@@ -686,3 +686,28 @@
   - 잡의 전반적인 처리량 늘릴 수 있음
   - 서로 관련 없는 여러 파일을 처리하는 경우 유용함
   - `FlowBuilder` 의 `split` 메서드를 사용하여 여러 플로우를 병렬로 실행
+- `AsyncItemProcessor`와 `AsyncItemWriter`
+  - 새 스레드에서 `ItemProcessor`, `ItemWriter` 실행
+  - `AsyncItemProcessor` 는 `ItemProcessor` 의 데코레이터로 `ItemWriter` 에 `Future` 전달
+  - `spring-batch-integration` 의존성 필요
+
+### 파티셔닝
+
+- 마스터 스텝이 처리할 일을 여러 워커 스텝으로 넘기는 개념
+  - 큰 데이터셋이 작은 파티션으로 나뉨
+  - 병렬 처리
+- `Partitioner`
+  - 파티셔닝할 데이터를 여러 파티션으로 나누는 역할
+  - 기본적으로 `MultiResourcePartitioner` 제공
+  - `ExecutionContext` 에 식별 데이터를 포함한 파티션 구성 정보 저장
+- `PartitionHandler`
+  - 워커에게 작업할 대상이나 모든 작업의 완료 시점을 식별 데이터를 전달하는 역할
+  - 세 가지 구현체 제공
+    - `TaskExecutorPartitionHandler`
+      - 단일 JVM 내에서 파티셔닝 개념 사용
+    - `MessageChannelPartitionHandler` (ex. rabbitMQ)
+      - 원격에서 처리할 수 있도록 JVM 에 메타데이터 전송 (스프링 인티그레이션 사용)
+      - 파티셔닝으로 구성한 워커에서 결과를 가져오는 두 가지 방법
+        - 각 워커가 회신한 메시지를 마스터가 수신하여 집계
+        - `JobRepository` 를 폴링하여 `StepExecution` 상태 확인
+    - `DeployerPartitionHandler`: 클라우드 환경에서 파티셔닝 개념 사용 (스프링 클라우드 태스크에서 제공)

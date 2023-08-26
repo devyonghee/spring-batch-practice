@@ -12,6 +12,11 @@ spring:
       initialize-schema: never
     job:
       name: ${JOB_NAME:NONE}
+  rabbitmq:
+    port: 5672
+    host: localhost
+    username: admin
+    password: password
 decorator:
   datasource:
     p6spy:

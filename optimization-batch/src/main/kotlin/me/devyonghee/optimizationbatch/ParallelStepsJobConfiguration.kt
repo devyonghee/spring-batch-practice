@@ -115,11 +115,4 @@ class ParallelStepsJobConfiguration(
             ).beanMapped()
             .build()
     }
-
-
-    data class Transaction(
-        val account: String,
-        val amount: BigDecimal,
-        val timestamp: Date,
-    )
 }
