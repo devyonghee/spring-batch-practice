@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("org.springframework.boot") version "3.1.1" apply false
-    id("io.spring.dependency-management") version "1.1.0" apply false
+    id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm") version "1.9.0"
     kotlin("plugin.spring") version "1.9.0" apply false
 }
@@ -37,6 +37,12 @@ subprojects {
         implementation("org.jetbrains.kotlin:kotlin-reflect")
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testImplementation("org.springframework.batch:spring-batch-test")
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.cloud:spring-cloud-dependencies:2022.0.3")
+        }
     }
 }
 

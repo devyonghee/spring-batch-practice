@@ -710,4 +710,8 @@
       - 파티셔닝으로 구성한 워커에서 결과를 가져오는 두 가지 방법
         - 각 워커가 회신한 메시지를 마스터가 수신하여 집계
         - `JobRepository` 를 폴링하여 `StepExecution` 상태 확인
-    - `DeployerPartitionHandler`: 클라우드 환경에서 파티셔닝 개념 사용 (스프링 클라우드 태스크에서 제공)
+    - `DeployerPartitionHandler`
+      - 클라우드 환경에서 파티셔닝 개념 사용 (스프링 클라우드 태스크에서 제공)
+      - `TaskLauncher` 추상화를 사용해 워커 실행
+      - 파티션 스텝이 시작하면 마스터 스텝이 파티션 수를 결정하고 애플리케이션의 새 인스턴스를 구동
+      - 클라우드 파운드리 (Cluoud Foundry), 쿠버네티스, 로컬 버전용 `TaskLauncher` 제공
