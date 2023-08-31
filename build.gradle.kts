@@ -26,6 +26,8 @@ allprojects {
     }
 }
 
+val kotestVersion = "5.6.2"
+
 subprojects {
     apply(plugin = "kotlin")
     apply(plugin = "org.springframework.boot")
@@ -35,6 +37,10 @@ subprojects {
     dependencies {
         implementation("org.springframework.boot:spring-boot-starter-batch")
         implementation("org.jetbrains.kotlin:kotlin-reflect")
+        testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+        testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+        testImplementation("io.mockk:mockk:1.13.7")
+
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testImplementation("org.springframework.batch:spring-batch-test")
     }
