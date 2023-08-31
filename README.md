@@ -892,4 +892,18 @@
   - 컴포넌트 간의 상호작용이 정상적으로 수행되는지 테스트
   - 주로 데이터베이스와의 상호작용, 스프링 빈과의 상호작용을 확인하기 위한 테스트
 - 스프링 배치 테스트
-  - 
+  - `@SpringBatchTest`
+    - 스프링 배치 잡을 테스트하는 데 사용할 수 있는 유틸리티 제공
+  - `JobLauncherTestUtils`을 통해 잡 실행 테스트 가능
+  - `TestUtils.launchStep` 을 통해 스텝 실행 테스트 가능
+  - `TestExecutionListner` 사용
+    - 테스트 메서드 실행 전 후에 수행되어야 하는 일을 정의하는 API
+    - 모든 메서드에 원하는 동작을 재사용 가능한 방식으로 삽입 가능
+    - `open()`, `read()` 메서드로 올바른 데이터를 읽어오는지 테스트 가능
+    - 스프링에서 제공하는 구현체
+      - `DependencyInjectionTestExecutionListener`
+      - `DirtiesContextTestExecutionListener`
+      - `TransactionalTestExecutionListener`
+    - 스프링 배치에서 제공하는 구현체
+      - `StepScopeTestExecutionListener`
+      - `JobScopeTestExecutionListener`
